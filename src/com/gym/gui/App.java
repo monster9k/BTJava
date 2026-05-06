@@ -3,6 +3,8 @@ package com.gym.gui;
 import java.awt.EventQueue;
 
 /**
+ * javac -encoding UTF-8 -d ./bin ./src/com/gym/gui/*.java
+java "-Dfile.encoding=UTF-8" -cp ./bin com.gym.gui.App
  * Điểm khởi động chính (Main Entry Point)
  * Chạy toàn bộ ứng dụng từ đây
  */
@@ -16,8 +18,7 @@ public class App {
                     LoginJFram frame = new LoginJFram();
                     frame.setVisible(true);
                     
-                    // TODO: Sau này thêm logic xử lý đăng nhập
-                    // if (loginSuccess) { mở MainWindow, đóng LoginJFram }
+                
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

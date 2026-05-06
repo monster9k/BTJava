@@ -7,6 +7,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.Authenticator;
 
 /**
  * LoginJFrame - Màn hình đăng nhập sử dụng Swing
@@ -35,7 +36,39 @@ public class LoginJFram extends JFrame {
 
         add(leftPanel);
         add(rightPanel);
+        btnLogin.addActionListener(e -> handlelogin());
     }
+
+        // Xử lý sự kiện đóng cửa sổ
+        private void handlelogin(){
+            String username = txtUsername.getText();
+            String password = new String(txtPassword.getPassword());
+
+            // TODO: Gọi đến Database Service để kiểm tra user/pass và lấy role
+            String role = Authenticate(username, password);
+            if(role == null){
+                lblError.setText("Sai tk hoặc mk");
+            }
+            else{//đăng nhập thành công
+                //đóng cửa sổ
+                this.dispose();
+
+                if(role.equals("ADMIN")){
+                    new AdminDashboard(username).setVisible(true);
+                }
+                else if(role.equals("STAFF")){
+                    JOptionPane.showMessageDialog(this, "Chào mừng Staff: " + username);
+                    //new StaffDashboard(username).setVisible(true);
+                }
+            }
+        }
+
+        private String Authenticate(String user, String pass) {
+        if (user.equals("admin") && pass.equals("123")) return "ADMIN";
+        if (user.equals("staff") && pass.equals("123")) return "STAFF";
+        return null;
+        }
+
 
     // PANEL TRÁI — Logo và Slogan
     private JPanel buildLeftPanel() {
@@ -110,14 +143,6 @@ public class LoginJFram extends JFrame {
 
         // Nút đăng nhập
         btnLogin = new JButton(" ĐĂNG NHẬP ");
-         btnLogin.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		String us = txtUsername.getText();
-        		char[] paChars = txtPassword.getPassword();
-        		String pa = new String(paChars);
-        		
-        	}
-        });
         btnLogin.setFont(new Font("Tahoma", Font.BOLD, 14));
         btnLogin.setBackground(new Color(255, 193, 7));
         btnLogin.setFocusPainted(false); // Xóa viền focus khi click
