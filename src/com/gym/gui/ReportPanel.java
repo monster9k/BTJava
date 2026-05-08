@@ -3,6 +3,9 @@ package com.gym.gui;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
+
+import com.gym.gui.AppStyle.RoundedBorder;
+
 import java.awt.*;
 
 import static com.gym.gui.AppStyle.*;
@@ -85,30 +88,41 @@ public class ReportPanel extends JPanel {
             new RoundedBorder(accent.darker(), 1, 12),
             new EmptyBorder(16, 18, 16, 18)
         ));
+        
+        //Panel chứa icon với hiệu ứng background
         JPanel iconPanel = new JPanel(new GridBagLayout());
         iconPanel.setBackground(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 40));
         iconPanel.setPreferredSize(new Dimension(44, 44));
         iconPanel.setBorder(new RoundedBorder(new Color(60, 65, 85), 1, 10));
+        
         JLabel emojiLbl = new JLabel(emoji);
-        emojiLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+        emojiLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20)); 
+        emojiLbl.setForeground(TEXT_WHITE);
         iconPanel.add(emojiLbl);
+
         JPanel top = new JPanel(new BorderLayout());
         top.setOpaque(false);
+        top.setBackground(CARD_BG);
+
         JLabel valueLbl = new JLabel(value);
         valueLbl.setFont(FONT_CARD_N);
         valueLbl.setForeground(TEXT_WHITE);
+
         top.add(iconPanel, BorderLayout.WEST);
         top.add(valueLbl, BorderLayout.EAST);
+
         JLabel labelLbl = new JLabel(label);
         labelLbl.setFont(FONT_MENU_B);
         labelLbl.setForeground(TEXT_WHITE);
-        labelLbl.setBorder(new EmptyBorder(10, 0, 0, 0));
+        labelLbl.setBorder(new EmptyBorder(10, 0, 0, 0)); // Tạo khoảng cách với icon
+
         JLabel subLbl = new JLabel(sub);
         subLbl.setFont(FONT_SMALL);
         subLbl.setForeground(accent);
-        card.add(top,      BorderLayout.NORTH);
+
+        card.add(top, BorderLayout.NORTH);
         card.add(labelLbl, BorderLayout.CENTER);
-        card.add(subLbl,   BorderLayout.SOUTH);
+        card.add(subLbl, BorderLayout.SOUTH);
         return card;
     }
 

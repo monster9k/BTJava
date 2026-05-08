@@ -121,10 +121,13 @@ public class AdminDashboard extends JFrame {
         sidebar.add(makeDivider());
  
         JButton btnChangePwd = makeMenuButton("  Đổi mật khẩu", false);
+        JButton btnPersonal = makeMenuButton("  Thông tin cá nhân", false);
         JButton btnLogout    = makeMenuButton("  Đăng xuất",     false);
         btnLogout.setForeground(ACCENT_RED);
         sidebar.add(btnChangePwd);
+        sidebar.add(btnPersonal);
         sidebar.add(btnLogout);
+
         sidebar.add(Box.createVerticalStrut(16));
  
         // Events
@@ -139,7 +142,9 @@ public class AdminDashboard extends JFrame {
         btnSubs.addActionListener(e ->      { setActiveMenu(btnSubs);      showPanel(new SubscriptionPanel(this)); });
         btnCheckin.addActionListener(e ->   { setActiveMenu(btnCheckin);   showPanel(new CheckinPanel()); });
         btnChangePwd.addActionListener(e -> new ChangePwdDialog(this).setVisible(true));
+        btnPersonal.addActionListener(e -> { setActiveMenu(btnPersonal); showPanel(new PersonalInfoPanel(this, adminName)); });
         btnLogout.addActionListener(e ->    confirmLogout());
+
  
         return sidebar;
     }

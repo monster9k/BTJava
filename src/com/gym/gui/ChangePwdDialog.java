@@ -1,7 +1,6 @@
 package com.gym.gui;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import java.awt.*;
 
 import static com.gym.gui.AppStyle.*;
