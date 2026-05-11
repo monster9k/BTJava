@@ -1,4 +1,4 @@
-package com.gym.gui;
+package com.gym.gui.Admin;
  
 import javax.swing.*;
 import javax.swing.border.*;
@@ -6,6 +6,10 @@ import java.awt.*;
 import java.awt.event.*;
  
 import static com.gym.gui.AppStyle.*;
+
+import com.gym.gui.AppStyle;
+import com.gym.gui.AppStyle.RoundedBorder;
+import com.gym.gui.Staff.*;
  
 /**
  * AdminDashboard.java  ← Main Frame (khung điều hướng duy nhất)

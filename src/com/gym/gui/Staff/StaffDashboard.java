@@ -1,10 +1,12 @@
-package com.gym.gui;
+package com.gym.gui.Staff;
 
 import javax.swing.*;
 import javax.swing.border.*;
 
 import com.gym.gui.AppStyle.RoundedBorder;
 import com.gym.gui.LoginJFram;
+import com.gym.gui.Admin.MemberManagementPanel;
+import com.gym.gui.Admin.SubscriptionPanel;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -1,7 +1,11 @@
-package com.gym.gui;
+package com.gym.gui.Admin;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
+
+import com.gym.gui.AppStyle;
+import com.gym.gui.AppStyle.RoundedBorder;
+
 import java.awt.*;
 
 import static com.gym.gui.AppStyle.*;

@@ -1,8 +1,9 @@
-package com.gym.gui;
+package com.gym.gui.Admin;
 
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
+
 import java.awt.*;
 
 import static com.gym.gui.AppStyle.*;

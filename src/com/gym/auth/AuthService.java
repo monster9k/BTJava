@@ -1,4 +1,4 @@
-package com.gym.service;
+package com.gym.auth;
 
 import com.gym.auth.UserSession;
 import com.gym.dao.IUserDAO;

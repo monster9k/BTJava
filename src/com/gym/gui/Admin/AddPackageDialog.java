@@ -1,4 +1,4 @@
-package com.gym.gui;
+package com.gym.gui.Admin;
 
 import javax.swing.*;
 import javax.swing.border.*;

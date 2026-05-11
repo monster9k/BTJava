@@ -1,9 +1,10 @@
-package com.gym.gui;
+package com.gym.gui.Admin;
 
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
 
+import com.gym.gui.AppStyle;
 import com.gym.gui.AppStyle.RoundedBorder;
 
 import java.awt.*;

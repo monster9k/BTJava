@@ -1,8 +1,12 @@
-package com.gym.gui;
+package com.gym.gui.Staff;
 
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
+
+import com.gym.gui.AppStyle;
+import com.gym.gui.AppStyle.RoundedBorder;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalTime;
