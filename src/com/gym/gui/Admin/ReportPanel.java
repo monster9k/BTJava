@@ -6,8 +6,20 @@ import javax.swing.table.*;
 
 import com.gym.gui.AppStyle;
 import com.gym.gui.AppStyle.RoundedBorder;
+import com.gym.entity.Member;
+import com.gym.entity.GymPackage;
+import com.gym.entity.Subscription;
+import com.gym.service.MemberService;
+import com.gym.service.PackageService;
+import com.gym.service.ReportService;
+import com.gym.util.AppConstants;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import static com.gym.gui.AppStyle.*;
 
@@ -19,6 +31,15 @@ import static com.gym.gui.AppStyle.*;
 public class ReportPanel extends JPanel {
 
     private DefaultTableModel tableModel;
+    private final ReportService reportService = new ReportService();
+    private final MemberService memberService = new MemberService();
+    private final PackageService packageService = new PackageService();
+    private JLabel revenueValue;
+    private JLabel packagesValue;
+    private JLabel unpaidValue;
+    private JComboBox<String> cbMonth;
+    private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
 
     public ReportPanel() {
         setBackground(BG_DARK);
@@ -39,11 +60,15 @@ public class ReportPanel extends JPanel {
         lblThang.setFont(FONT_MENU);
         lblThang.setForeground(TEXT_GRAY);
 
-        String[] months = {"Tháng 5/2026","Tháng 4/2026","Tháng 3/2026","Tháng 2/2026","Tháng 1/2026"};
-        JComboBox<String> cbMonth = makeStyledCombo(months);
+        cbMonth = makeStyledCombo(buildMonthOptions());
 
         JButton btnLoc = makeActionButton("Lọc", ACCENT_BLUE);
-        // TODO: btnLoc.addActionListener(e -> filterByMonth(cbMonth.getSelectedItem()));
+        btnLoc.addActionListener(e -> {
+            YearMonth ym = parseMonth((String) cbMonth.getSelectedItem());
+            if (ym != null) {
+                loadMonth(ym.getYear(), ym.getMonthValue());
+            }
+        });
 
         header.add(title);
         header.add(Box.createHorizontalStrut(20));
@@ -56,21 +81,20 @@ public class ReportPanel extends JPanel {
         JPanel summaryRow = new JPanel(new GridLayout(1, 3, 16, 0));
         summaryRow.setBackground(BG_DARK);
         summaryRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-        summaryRow.add(makeStatCard("Tổng doanh thu T5", "32,500,000đ", "↑ +8% so tháng trước", ACCENT_GREEN, "💰"));
-        summaryRow.add(makeStatCard("Số gói đã bán",     "68 gói",      "trong tháng 5/2026",   ACCENT_BLUE,  "📦"));
-        summaryRow.add(makeStatCard("Chưa thu tiền",     "4 gói",       "cần theo dõi",         ACCENT_RED,   "⚠️"));
+        revenueValue = new JLabel("0đ");
+        packagesValue = new JLabel("0 gói");
+        unpaidValue = new JLabel("0 gói");
+        summaryRow.add(makeStatCard("Tổng doanh thu", revenueValue, "theo tháng đã chọn", ACCENT_GREEN, "💰"));
+        summaryRow.add(makeStatCard("Số gói đã bán", packagesValue, "trong tháng", ACCENT_BLUE, "📦"));
+        summaryRow.add(makeStatCard("Chưa thu tiền", unpaidValue, "cần theo dõi", ACCENT_RED, "⚠️"));
 
         // --- Detail table ---
         String[] cols = {"Ngày mua", "Mã HV", "Hội viên", "Gói tập", "Giá (VNĐ)", "TT Thanh toán"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
-        tableModel.addRow(new Object[]{"01/05/2026","MEM26001","Trần Thị Mai", "Gym 3 tháng",  "900,000",   "✅ Đã TT"});
-        tableModel.addRow(new Object[]{"02/05/2026","MEM26008","Lê Văn Bình",  "Yoga 1 tháng", "400,000",   "✅ Đã TT"});
-        tableModel.addRow(new Object[]{"02/05/2026","MEM26011","Nguyễn Minh",  "Gym VIP",      "800,000",   "⏳ Chưa TT"});
-        tableModel.addRow(new Object[]{"03/05/2026","MEM26019","Phạm Thu Hà",  "Gym 6 tháng",  "1,600,000", "✅ Đã TT"});
-        tableModel.addRow(new Object[]{"04/05/2026","MEM26022","Võ Thị Lan",   "Zumba",        "350,000",   "✅ Đã TT"});
-        tableModel.addRow(new Object[]{"05/05/2026","MEM26030","Hồ Văn Tùng",  "Gym 1 tháng",  "350,000",   "✅ Đã TT"});
+        YearMonth current = YearMonth.now();
+        loadMonth(current.getYear(), current.getMonthValue());
 
         JTable table = new JTable(tableModel);
         styleTableAppearance(table);
@@ -82,7 +106,7 @@ public class ReportPanel extends JPanel {
         add(center, BorderLayout.CENTER);
     }
 
-    private JPanel makeStatCard(String label, String value, String sub, Color accent, String emoji) {
+    private JPanel makeStatCard(String label, JLabel valueLbl, String sub, Color accent, String emoji) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(CARD_BG);
         card.setBorder(new CompoundBorder(
@@ -105,7 +129,6 @@ public class ReportPanel extends JPanel {
         top.setOpaque(false);
         top.setBackground(CARD_BG);
 
-        JLabel valueLbl = new JLabel(value);
         valueLbl.setFont(FONT_CARD_N);
         valueLbl.setForeground(TEXT_WHITE);
 
@@ -132,4 +155,53 @@ public class ReportPanel extends JPanel {
 
     /** Thêm một giao dịch vào bảng. */
     public void addRow(Object[] rowData) { tableModel.addRow(rowData); }
+
+    private String[] buildMonthOptions() {
+        YearMonth now = YearMonth.now();
+        String[] months = new String[6];
+        for (int i = 0; i < 6; i++) {
+            YearMonth ym = now.minusMonths(i);
+            months[i] = String.format("Tháng %d/%d", ym.getMonthValue(), ym.getYear());
+        }
+        return months;
+    }
+
+    private YearMonth parseMonth(String text) {
+        if (text == null) {
+            return null;
+        }
+        try {
+            String[] parts = text.replace("Tháng", "").trim().split("/");
+            int month = Integer.parseInt(parts[0].trim());
+            int year = Integer.parseInt(parts[1].trim());
+            return YearMonth.of(year, month);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private void loadMonth(int year, int month) {
+        BigDecimal revenue = reportService.getMonthlyRevenue(year, month);
+        int paidCount = reportService.getPaidCountByMonth(year, month);
+        int unpaidCount = reportService.getUnpaidCountByMonth(year, month);
+
+        revenueValue.setText(currencyFormat.format(revenue) + "đ");
+        packagesValue.setText(paidCount + " gói");
+        unpaidValue.setText(unpaidCount + " gói");
+
+        clearData();
+        for (Subscription s : reportService.getSubscriptionsByMonth(year, month)) {
+            Member m = memberService.getMemberById(s.getMemberId());
+            GymPackage p = packageService.getPackageById(s.getPackageId());
+
+            String date = s.getStartDate() != null ? s.getStartDate().format(dateFmt) : "";
+            String memberCode = m != null ? m.getMemberCode() : "";
+            String memberName = m != null ? m.getFullName() : "";
+            String packageName = p != null ? p.getPackageName() : "";
+            String price = currencyFormat.format(s.getPriceAtPurchase()) + "đ";
+            String payment = s.getPaymentStatus() == AppConstants.PAYMENT_PAID ? "✅ Đã TT" : "⏳ Chưa TT";
+
+            addRow(new Object[]{date, memberCode, memberName, packageName, price, payment});
+        }
+    }
 }

@@ -5,6 +5,9 @@ import javax.swing.border.CompoundBorder;
 
 import com.gym.gui.AppStyle;
 import com.gym.gui.AppStyle.RoundedBorder;
+import com.gym.auth.UserSession;
+import com.gym.entity.User;
+import com.gym.service.UserService;
 
 import java.awt.*;
 
@@ -19,6 +22,7 @@ public class PersonalInfoPanel extends JPanel {
 
     private final JFrame owner;
     private String adminName;
+    private final UserService userService = new UserService();
 
 
     public PersonalInfoPanel(JFrame owner, String adminName) {
@@ -109,9 +113,26 @@ public class PersonalInfoPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Mật khẩu xác nhận không khớp!", "Lỗi", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            User current = UserSession.getCurrentUser();
+            if (current == null) {
+                JOptionPane.showMessageDialog(this, "Không xác định được tài khoản hiện tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            // TODO: Gọi userDAO.changePassword(...) và cập nhật dob/profile vào DB
-            JOptionPane.showMessageDialog(this, "Đã lưu thông tin cá nhân (demo UI).", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            String newName = tfName.getText().trim();
+            if (newName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Tên hiển thị không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            boolean okProfile = userService.updateProfile(current.getUsername(), newName, current.getPhone());
+            boolean okPwd = userService.changePasswordNoVerify(current.getUsername(), np);
+            if (!okProfile || !okPwd) {
+                JOptionPane.showMessageDialog(this, "Cập nhật thông tin thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            JOptionPane.showMessageDialog(this, "Đã lưu thông tin cá nhân.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         });
 
         c.gridy = 8;

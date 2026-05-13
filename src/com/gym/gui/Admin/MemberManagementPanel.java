@@ -4,6 +4,10 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import java.awt.*;
+import java.time.format.DateTimeFormatter;
+
+import com.gym.entity.Member;
+import com.gym.service.MemberService;
 
 import static com.gym.gui.AppStyle.*;
 
@@ -15,6 +19,8 @@ public class MemberManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private final JFrame owner;
+    private final MemberService memberService = new MemberService();
+    private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public MemberManagementPanel(JFrame owner) {
         this.owner = owner;
@@ -37,8 +43,11 @@ public class MemberManagementPanel extends JPanel {
         JTextField searchField = makeStyledTextField("Tìm theo tên hoặc SĐT...", 20);
         JButton btnSearch = makeActionButton("🔍 Tìm kiếm", ACCENT_BLUE);
         JButton btnAdd    = makeActionButton("➕ Thêm hội viên", ACCENT_GREEN);
-        btnAdd.addActionListener(e -> new AddMemberDialog(owner).setVisible(true));
-        // TODO: btnSearch.addActionListener(e -> search(searchField.getText()));
+        btnAdd.addActionListener(e -> {
+            new AddMemberDialog(owner).setVisible(true);
+            loadMembers(memberService.getAllMembers());
+        });
+        btnSearch.addActionListener(e -> loadMembers(memberService.searchMembers(searchField.getText())));
         searchBar.add(searchField);
         searchBar.add(btnSearch);
         searchBar.add(btnAdd);
@@ -53,12 +62,7 @@ public class MemberManagementPanel extends JPanel {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
-        // Dữ liệu mẫu
-        tableModel.addRow(new Object[]{"MEM26001","Trần Thị Mai",   "0901234567","Nữ", "15/03/1998","01/01/2026","✅ Active",   "Sửa | Xóa"});
-        tableModel.addRow(new Object[]{"MEM26002","Lê Văn Bình",    "0912345678","Nam","22/07/1995","05/01/2026","✅ Active",   "Sửa | Xóa"});
-        tableModel.addRow(new Object[]{"MEM26003","Phạm Thu Hà",    "0923456789","Nữ", "08/11/2000","10/01/2026","✅ Active",   "Sửa | Xóa"});
-        tableModel.addRow(new Object[]{"MEM26004","Nguyễn Văn Minh","0934567890","Nam","30/04/1992","12/01/2026","✅ Active",   "Sửa | Xóa"});
-        tableModel.addRow(new Object[]{"MEM26005","Võ Thị Lan",     "0945678901","Nữ", "14/06/1999","15/01/2026","🔴 Đã khóa","Sửa | Mở"});
+        loadMembers(memberService.getAllMembers());
 
         JTable table = new JTable(tableModel);
         styleTableAppearance(table);
@@ -67,4 +71,23 @@ public class MemberManagementPanel extends JPanel {
 
     public void clearData() { tableModel.setRowCount(0); }
     public void addRow(Object[] rowData) { tableModel.addRow(rowData); }
+
+    private void loadMembers(java.util.List<Member> members) {
+        clearData();
+        for (Member m : members) {
+            String birth = m.getBirthday() != null ? m.getBirthday().format(dateFmt) : "";
+            String created = m.getCreatedAt() != null ? m.getCreatedAt().toLocalDate().format(dateFmt) : "";
+            String status = m.isStatus() ? "✅ Active" : "🔴 Đã khóa";
+            addRow(new Object[]{
+                    m.getMemberCode(),
+                    m.getFullName(),
+                    m.getPhone(),
+                    m.getGender(),
+                    birth,
+                    created,
+                    status,
+                    "Sửa | Xóa"
+            });
+        }
+    }
 }

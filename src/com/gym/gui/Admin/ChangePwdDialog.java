@@ -3,6 +3,10 @@ package com.gym.gui.Admin;
 import javax.swing.*;
 import java.awt.*;
 
+import com.gym.auth.UserSession;
+import com.gym.entity.User;
+import com.gym.service.UserService;
+
 import static com.gym.gui.AppStyle.*;
 
 /**
@@ -11,6 +15,7 @@ import static com.gym.gui.AppStyle.*;
  * Mở bằng: new ChangePwdDialog(parentFrame).setVisible(true);
  */
 public class ChangePwdDialog extends JDialog {
+    private final UserService userService = new UserService();
 
     public ChangePwdDialog(JFrame parent) {
         super(parent, "🔒 Đổi Mật Khẩu", true);
@@ -50,7 +55,20 @@ public class ChangePwdDialog extends JDialog {
                 JOptionPane.showMessageDialog(this, "Mật khẩu xác nhận không khớp!", "Lỗi", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            // TODO: Gọi userDAO.changePassword(...)
+            if (np.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập mật khẩu mới!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            User current = UserSession.getCurrentUser();
+            if (current == null) {
+                JOptionPane.showMessageDialog(this, "Không xác định được tài khoản hiện tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            boolean ok = userService.changePasswordNoVerify(current.getUsername(), np);
+            if (!ok) {
+                JOptionPane.showMessageDialog(this, "Đổi mật khẩu thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         });

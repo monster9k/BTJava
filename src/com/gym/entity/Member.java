@@ -9,6 +9,7 @@ public class Member {
     private String phone;
     private String gender;
     private java.time.LocalDate birthday;
+    private java.time.LocalDateTime createdAt;
     private boolean status;
 
     public int getId() {
@@ -57,6 +58,14 @@ public class Member {
 
     public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
+    }
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public boolean isStatus() {

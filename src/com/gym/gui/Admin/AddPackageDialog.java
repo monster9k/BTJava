@@ -3,6 +3,9 @@ package com.gym.gui.Admin;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.math.BigDecimal;
+
+import com.gym.service.PackageService;
 
 import static com.gym.gui.AppStyle.*;
 
@@ -12,6 +15,7 @@ import static com.gym.gui.AppStyle.*;
  * Mở bằng: new AddPackageDialog(parentFrame).setVisible(true);
  */
 public class AddPackageDialog extends JDialog {
+    private final PackageService packageService = new PackageService();
 
     public AddPackageDialog(JFrame parent) {
         super(parent, "➕ Thêm Gói Tập Mới", true);
@@ -30,7 +34,8 @@ public class AddPackageDialog extends JDialog {
         gbc.weightx = 1.0;
         gbc.gridx   = 0;
 
-        JTextField tfId       = makeStyledTextField("Nhập mã gói (VD: P08)", 20);
+        JTextField tfId       = makeStyledTextField("ID tự động", 20);
+        tfId.setEditable(false);
         JTextField tfName     = makeStyledTextField("Tên gói (1 tháng, VIP...)", 20);
         JTextField tfDuration = makeStyledTextField("Số ngày sử dụng (VD: 30)", 20);
         JTextField tfPrice    = makeStyledTextField("Giá niêm yết (VD: 500000)", 20);
@@ -56,11 +61,25 @@ public class AddPackageDialog extends JDialog {
 
         JButton btnSave = makeActionButton("💾 Lưu gói tập", ACCENT_GREEN);
         btnSave.addActionListener(e -> {
-            if (tfId.getText().trim().isEmpty() || tfName.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ ID và Tên gói!");
+            if (tfName.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập Tên gói!");
                 return;
             }
-            // TODO: Gọi packageDAO.insert(...)
+            try {
+                int duration = Integer.parseInt(tfDuration.getText().trim());
+                BigDecimal price = new BigDecimal(tfPrice.getText().trim());
+                String desc = ((JTextArea) ((JScrollPane) descPanel.getComponent(0)).getViewport().getView()).getText().trim();
+
+                boolean ok = packageService.addPackage(tfName.getText().trim(), duration, price, desc);
+                if (!ok) {
+                    JOptionPane.showMessageDialog(this, "Thêm gói tập thất bại. Vui lòng kiểm tra dữ liệu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Thời hạn và Giá phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             JOptionPane.showMessageDialog(this, "Thêm gói tập mới thành công!");
             dispose();
         });

@@ -6,8 +6,21 @@ import javax.swing.table.*;
 
 import com.gym.gui.AppStyle;
 import com.gym.gui.AppStyle.RoundedBorder;
+import com.gym.entity.CheckIn;
+import com.gym.entity.Member;
+import com.gym.entity.Subscription;
+import com.gym.entity.GymPackage;
+import com.gym.service.CheckInService;
+import com.gym.service.MemberService;
+import com.gym.service.PackageService;
+import com.gym.service.ReportService;
+import com.gym.service.SubscriptionService;
+import com.gym.service.UserService;
 
 import java.awt.*;
+import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import static com.gym.gui.AppStyle.*;
 
@@ -27,6 +40,14 @@ public class DashboardPanel extends JPanel {
 
     private DefaultTableModel expiringMembersModel;
     private DefaultTableModel todayCheckinModel;
+    private final MemberService memberService = new MemberService();
+    private final SubscriptionService subscriptionService = new SubscriptionService();
+    private final CheckInService checkInService = new CheckInService();
+    private final PackageService packageService = new PackageService();
+    private final ReportService reportService = new ReportService();
+    private final UserService userService = new UserService();
+    private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
 
     public DashboardPanel() {
         setBackground(BG_DARK);
@@ -39,10 +60,15 @@ public class DashboardPanel extends JPanel {
         JPanel statsRow = new JPanel(new GridLayout(1, 4, 16, 0));
         statsRow.setBackground(BG_DARK);
         statsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
-        statsRow.add(makeStatCard("Hội viên Active",    "248",        "+12 tháng này",           ACCENT_BLUE,   "🏃"));
-        statsRow.add(makeStatCard("Doanh thu tháng",    "32.5M",      "+8% so tháng trước",      ACCENT_GREEN,  "💰"));
-        statsRow.add(makeStatCard("Gói sắp hết hạn",   "17",         "trong 5 ngày tới",        ACCENT_ORANGE, "⚠️"));
-        statsRow.add(makeStatCard("Nhân viên",          "5",          "đang hoạt động",          ACCENT_RED,    "👥"));
+        int activeMembers = (int) memberService.getAllMembers().stream().filter(Member::isStatus).count();
+        String revenue = currencyFormat.format(reportService.getCurrentMonthRevenue()) + "đ";
+        int expiring = subscriptionService.getExpiringSubscriptionsDefault().size();
+        int staffCount = userService.getAllStaff().size();
+
+        statsRow.add(makeStatCard("Hội viên Active",    String.valueOf(activeMembers), "đang hoạt động", ACCENT_BLUE,   "🏃"));
+        statsRow.add(makeStatCard("Doanh thu tháng",    revenue, "tháng hiện tại", ACCENT_GREEN,  "💰"));
+        statsRow.add(makeStatCard("Gói sắp hết hạn",   String.valueOf(expiring), "trong 5 ngày tới", ACCENT_ORANGE, "⚠️"));
+        statsRow.add(makeStatCard("Nhân viên",          String.valueOf(staffCount), "đang hoạt động", ACCENT_RED,    "👥"));
 
         add(statsRow);
         add(Box.createVerticalStrut(20));
@@ -122,12 +148,7 @@ public class DashboardPanel extends JPanel {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
-        // Dữ liệu mẫu — thay bằng setData() khi có backend
-        addExpiringMember("MEM26001", "Trần Thị Mai",  "0901234567", "05/05/2026");
-        addExpiringMember("MEM26002", "Lê Văn Bình",   "0912345678", "06/05/2026");
-        addExpiringMember("MEM26015", "Phạm Thu Hà",   "0923456789", "07/05/2026");
-        addExpiringMember("MEM26020", "Nguyễn Minh",   "0934567890", "08/05/2026");
-        addExpiringMember("MEM26031", "Võ Thị Lan",    "0945678901", "09/05/2026");
+        loadExpiringMembers();
 
         JTable table = new JTable(expiringMembersModel);
         styleTableAppearance(table);
@@ -168,12 +189,7 @@ public class DashboardPanel extends JPanel {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
-        // Dữ liệu mẫu
-        addTodayCheckin("MEM26005", "Đặng Văn Tú",   "Gym 3 tháng",  "06:15");
-        addTodayCheckin("MEM26009", "Bùi Thị Loan",  "Yoga 1 tháng", "07:00");
-        addTodayCheckin("MEM26012", "Trương Minh",   "Gym VIP",       "07:45");
-        addTodayCheckin("MEM26019", "Hồ Thu Nga",    "Zumba",         "08:30");
-        addTodayCheckin("MEM26025", "Lý Văn Đức",   "Gym 3 tháng",   "09:00");
+        loadTodayCheckins();
 
         JTable table = new JTable(todayCheckinModel);
         styleTableAppearance(table);
@@ -192,5 +208,34 @@ public class DashboardPanel extends JPanel {
     /** Xóa toàn bộ dữ liệu bảng check-in để load lại. */
     public void clearTodayCheckin() {
         todayCheckinModel.setRowCount(0);
+    }
+
+    private void loadExpiringMembers() {
+        clearExpiringMembers();
+        for (Subscription s : subscriptionService.getExpiringSubscriptionsDefault()) {
+            Member m = memberService.getMemberById(s.getMemberId());
+            String code = m != null ? m.getMemberCode() : "";
+            String name = m != null ? m.getFullName() : "";
+            String phone = m != null ? m.getPhone() : "";
+            String expiry = s.getEndDate() != null ? s.getEndDate().format(dateFmt) : "";
+            addExpiringMember(code, name, phone, expiry);
+        }
+    }
+
+    private void loadTodayCheckins() {
+        clearTodayCheckin();
+        for (CheckIn c : checkInService.getCheckInsForDate(java.time.LocalDate.now())) {
+            Subscription s = subscriptionService.getSubscriptionById(c.getSubscriptionId());
+            if (s == null) {
+                continue;
+            }
+            Member m = memberService.getMemberById(s.getMemberId());
+            GymPackage p = packageService.getPackageById(s.getPackageId());
+            String code = m != null ? m.getMemberCode() : "";
+            String name = m != null ? m.getFullName() : "";
+            String pkg = p != null ? p.getPackageName() : "";
+            String time = c.getCheckInTime() != null ? c.getCheckInTime().toLocalDateTime().toLocalTime().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")) : "";
+            addTodayCheckin(code, name, pkg, time);
+        }
     }
 }

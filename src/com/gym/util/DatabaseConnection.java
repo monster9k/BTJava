@@ -17,17 +17,17 @@ public class DatabaseConnection {
         }
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
-//    // --- HÀM TEST NHANH ---
-//    public static void main(String[] args) {
-//        try (Connection conn = getConnection()) {
-//            if (conn != null) {
-//                System.out.println("Kết nối Database THÀNH CÔNG!");
-//                System.out.println("Thông tin DB: " + conn.getMetaData().getDatabaseProductName());
-//            }
-//        } catch (SQLException e) {
-//            System.err.println("Kết nối THẤT BẠI!");
-//            e.printStackTrace();
-//        }
-//    }
+   // --- HÀM TEST NHANH ---
+   public static void main(String[] args) {
+       try (Connection conn = getConnection()) {
+           if (conn != null) {
+                System.out.println("Kết nối Database THÀNH CÔNG!");
+               System.out.println("Thông tin DB: " + conn.getMetaData().getDatabaseProductName());
+           }
+        } catch (SQLException e) {
+            System.err.println("Kết nối THẤT BẠI!");
+            e.printStackTrace();
+        }
+   }
 
 }

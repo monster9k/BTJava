@@ -29,9 +29,14 @@ public class AuthService {
 
     // Xử lý Đăng ký tài khoản
     public boolean register(String username, String rawPassword, String fullName, int roleId) {
-        if (username.isEmpty() || rawPassword.isEmpty() || fullName.isEmpty()) return false;
+        if (username.isEmpty() || rawPassword.isEmpty() || fullName.isEmpty()) {
+            System.out.println("✗ Register: Empty input");
+            return false;
+        }
 
+        System.out.println("Register: Hashing password for username=" + username);
         String hashedPassword = SecurityUtil.hashPassword(rawPassword);
+        System.out.println("Register: Hash result=" + hashedPassword);
 
         User newUser = new User();
         newUser.setUsername(username);
@@ -40,7 +45,15 @@ public class AuthService {
         newUser.setRoleId(roleId);
         newUser.setStatus(true);
 
+        System.out.println("Register: About to insert user...");
         int result = userDAO.insert(newUser);
+        System.out.println("Register: Insert result=" + result);
         return result > 0;
+    }
+
+    // Kiểm tra username đã tồn tại trong database
+    public boolean checkUsernameExists(String username) {
+        User user = userDAO.findByUsername(username);
+        return user != null;
     }
 }

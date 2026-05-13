@@ -6,9 +6,18 @@ import javax.swing.table.*;
 
 import com.gym.gui.AppStyle;
 import com.gym.gui.AppStyle.RoundedBorder;
+import com.gym.entity.CheckIn;
+import com.gym.entity.Member;
+import com.gym.entity.GymPackage;
+import com.gym.entity.Subscription;
+import com.gym.service.CheckInService;
+import com.gym.service.MemberService;
+import com.gym.service.PackageService;
+import com.gym.service.SubscriptionService;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
@@ -34,7 +43,11 @@ public class StaffCheckinPanel extends JPanel {
     private JPanel               memberCard;
     private JLabel               checkinCountLabel;
     private DefaultTableModel    historyModel;
-    private int                  checkinCount = 5; // Giả lập đã có 5 lượt
+    private int                  checkinCount = 0;
+    private final MemberService memberService = new MemberService();
+    private final SubscriptionService subscriptionService = new SubscriptionService();
+    private final PackageService packageService = new PackageService();
+    private final CheckInService checkInService = new CheckInService();
 
     public StaffCheckinPanel(StaffDashboard owner) {
         this.owner = owner;
@@ -308,13 +321,7 @@ public class StaffCheckinPanel extends JPanel {
         historyModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
-
-        // Dữ liệu mẫu
-        historyModel.addRow(new Object[]{"1", "MEM26005", "Đặng Văn Tú",  "Gym 3 tháng",  "06:15"});
-        historyModel.addRow(new Object[]{"2", "MEM26009", "Bùi Thị Loan", "Yoga 1 tháng", "07:00"});
-        historyModel.addRow(new Object[]{"3", "MEM26012", "Trương Minh",  "Gym VIP",      "07:45"});
-        historyModel.addRow(new Object[]{"4", "MEM26019", "Hồ Thu Nga",   "Zumba",        "08:30"});
-        historyModel.addRow(new Object[]{"5", "MEM26025", "Lý Văn Đức",  "Gym 3 tháng",  "09:00"});
+        loadHistoryToday();
 
         JTable table = new JTable(historyModel);
         styleTableAppearance(table);
@@ -346,62 +353,99 @@ public class StaffCheckinPanel extends JPanel {
         return panel;
     }
 
+    private void loadHistoryToday() {
+        historyModel.setRowCount(0);
+        int index = 1;
+        for (CheckIn c : checkInService.getCheckInsForDate(LocalDate.now())) {
+            Subscription s = subscriptionService.getSubscriptionById(c.getSubscriptionId());
+            if (s == null) {
+                continue;
+            }
+            Member m = memberService.getMemberById(s.getMemberId());
+            GymPackage p = packageService.getPackageById(s.getPackageId());
+            String memberCode = m != null ? m.getMemberCode() : "";
+            String name = m != null ? m.getFullName() : "";
+            String pkg = p != null ? p.getPackageName() : "";
+            String time = c.getCheckInTime() != null
+                    ? c.getCheckInTime().toLocalDateTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+                    : "";
+            historyModel.addRow(new Object[]{String.valueOf(index++), memberCode, name, pkg, time});
+        }
+        checkinCount = historyModel.getRowCount();
+        checkinCountLabel.setText("Hôm nay: " + checkinCount + " lượt");
+    }
+
     // ===================================================================
     //  LOGIC TÌM KIẾM (giả lập — thay bằng DAO thật)
     // ===================================================================
     private void doSearch() {
         String query = searchField.getText().trim();
         if (query.isEmpty() || query.startsWith("Nhập mã")) return;
-
-        // --- Giả lập lookup ---
-        if (query.equalsIgnoreCase("MEM26001") || query.equals("0901234567")) {
-            renderMemberFound("MEM26001", "Trần Thị Mai", "0901234567",
-                "Gym 3 tháng", "01/08/2026", true);
-        } else if (query.equalsIgnoreCase("MEM26005") || query.equals("0945678901")) {
-            renderMemberFound("MEM26005", "Võ Thị Lan", "0945678901",
-                "Gym 1 tháng", "30/04/2026", false); // đã hết hạn
-        } else {
-            // Không tìm thấy
-            memberCard.removeAll();
-            JPanel center = new JPanel(new GridBagLayout());
-            center.setBackground(CARD_BG);
-            JPanel inner = new JPanel();
-            inner.setOpaque(false);
-            inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
-            JLabel ico = new JLabel("❓");
-            ico.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 44));
-            ico.setAlignmentX(Component.CENTER_ALIGNMENT);
-            JLabel msg = new JLabel("Không tìm thấy hội viên");
-            msg.setFont(FONT_MENU_B);
-            msg.setForeground(ACCENT_RED);
-            msg.setAlignmentX(Component.CENTER_ALIGNMENT);
-            JLabel sub = new JLabel("Kiểm tra lại mã HV hoặc số điện thoại");
-            sub.setFont(FONT_SMALL);
-            sub.setForeground(TEXT_GRAY);
-            sub.setAlignmentX(Component.CENTER_ALIGNMENT);
-            inner.add(ico);
-            inner.add(Box.createVerticalStrut(10));
-            inner.add(msg);
-            inner.add(Box.createVerticalStrut(5));
-            inner.add(sub);
-            center.add(inner);
-            memberCard.add(center, BorderLayout.CENTER);
-            memberCard.revalidate();
-            memberCard.repaint();
+        Member member = memberService.findByCodeOrPhone(query);
+        if (member == null) {
+            renderNotFound();
+            return;
         }
+
+        Subscription sub = subscriptionService.getActiveSubscription(member.getId());
+        GymPackage pkg = sub != null ? packageService.getPackageById(sub.getPackageId()) : null;
+
+        String pkgName = pkg != null ? pkg.getPackageName() : "";
+        String expiry = sub != null && sub.getEndDate() != null ? sub.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
+        boolean allowed = subscriptionService.isValidForCheckIn(sub);
+
+        renderMemberFound(member.getMemberCode(), member.getFullName(), member.getPhone(), pkgName, expiry, allowed);
+    }
+
+    private void renderNotFound() {
+        memberCard.removeAll();
+        JPanel center = new JPanel(new GridBagLayout());
+        center.setBackground(CARD_BG);
+        JPanel inner = new JPanel();
+        inner.setOpaque(false);
+        inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
+        JLabel ico = new JLabel("❓");
+        ico.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 44));
+        ico.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel msg = new JLabel("Không tìm thấy hội viên");
+        msg.setFont(FONT_MENU_B);
+        msg.setForeground(ACCENT_RED);
+        msg.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel sub = new JLabel("Kiểm tra lại mã HV hoặc số điện thoại");
+        sub.setFont(FONT_SMALL);
+        sub.setForeground(TEXT_GRAY);
+        sub.setAlignmentX(Component.CENTER_ALIGNMENT);
+        inner.add(ico);
+        inner.add(Box.createVerticalStrut(10));
+        inner.add(msg);
+        inner.add(Box.createVerticalStrut(5));
+        inner.add(sub);
+        center.add(inner);
+        memberCard.add(center, BorderLayout.CENTER);
+        memberCard.revalidate();
+        memberCard.repaint();
     }
 
     // ===================================================================
     //  LOGIC XÁC NHẬN CHECK-IN
     // ===================================================================
     private void doConfirmCheckin(String memberId, String name, String pkg) {
+        Member member = memberService.getMemberByCode(memberId);
+        if (member == null) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy hội viên.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        boolean ok = checkInService.checkInByMemberId(member.getId());
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Check-in thất bại. Vui lòng kiểm tra trạng thái gói.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-        checkinCount++;
         int stt = historyModel.getRowCount() + 1;
         historyModel.addRow(new Object[]{String.valueOf(stt), memberId, name, pkg, time});
-        checkinCountLabel.setText("Hôm nay: " + checkinCount + " lượt");
+        checkinCountLabel.setText("Hôm nay: " + historyModel.getRowCount() + " lượt");
 
-        // TODO: checkinDAO.insert(memberId, LocalDate.now(), LocalTime.now())
         JOptionPane.showMessageDialog(this,
             "✅  Check-in thành công!\n" + name + " — " + time,
             "Check-in", JOptionPane.INFORMATION_MESSAGE

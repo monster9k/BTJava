@@ -5,6 +5,7 @@ public class User {
     private String username;
     private String password;
     private String fullname;
+    private String phone;
     private int roleId;
     private boolean status;
 
@@ -38,6 +39,14 @@ public class User {
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public int getRoleId() {

@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 
+import com.gym.service.MemberService;
+
 import static com.gym.gui.AppStyle.*;
 
 /**
@@ -12,6 +14,7 @@ import static com.gym.gui.AppStyle.*;
  * Mở bằng: new AddMemberDialog(parentFrame).setVisible(true);
  */
 public class AddMemberDialog extends JDialog {
+    private final MemberService memberService = new MemberService();
 
     public AddMemberDialog(JFrame parent) {
         super(parent, "➕ Thêm Hội Viên Mới", true);
@@ -29,7 +32,8 @@ public class AddMemberDialog extends JDialog {
         gbc.weightx = 1.0;
         gbc.gridx   = 0;
 
-        JTextField tfMemberCode = makeStyledTextField("MEM2026001", 20);
+        JTextField tfMemberCode = makeStyledTextField(memberService.getNextMemberCode(), 20);
+        tfMemberCode.setEditable(false);
         JTextField tfFullName   = makeStyledTextField("Họ và tên khách hàng", 20);
         JTextField tfPhone      = makeStyledTextField("Số điện thoại (09...)", 20);
 
@@ -61,8 +65,17 @@ public class AddMemberDialog extends JDialog {
                 return;
             }
             java.util.Date dob = (java.util.Date) spBirthday.getValue();
-            // TODO: Gọi memberDAO.insert(...)
-            JOptionPane.showMessageDialog(this, "Thêm hội viên \"" + name + "\" thành công!\nNgày sinh: " + dob);
+            java.time.LocalDate birthday = dob != null ? new java.sql.Date(dob.getTime()).toLocalDate() : null;
+            String phone = tfPhone.getText().trim();
+            String gender = (String) cbGender.getSelectedItem();
+
+            boolean ok = memberService.addMember(name, phone, gender, birthday);
+            if (!ok) {
+                JOptionPane.showMessageDialog(this, "Thêm hội viên thất bại. Vui lòng kiểm tra dữ liệu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            JOptionPane.showMessageDialog(this, "Thêm hội viên \"" + name + "\" thành công!\nMã hội viên: " + tfMemberCode.getText());
             dispose();
         });
 

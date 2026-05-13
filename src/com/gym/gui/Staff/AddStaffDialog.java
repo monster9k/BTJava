@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 
+import com.gym.service.UserService;
+import com.gym.util.AppConstants;
+
 import static com.gym.gui.AppStyle.*;
 
 /**
@@ -12,6 +15,7 @@ import static com.gym.gui.AppStyle.*;
  * Mở bằng: new AddStaffDialog(parentFrame).setVisible(true);
  */
 public class AddStaffDialog extends JDialog {
+    private final UserService userService = new UserService();
 
     public AddStaffDialog(JFrame parent) {
         super(parent, "➕ Thêm Nhân Viên Mới", true);
@@ -53,11 +57,28 @@ public class AddStaffDialog extends JDialog {
         JButton btnSave = makeActionButton("💾 Lưu nhân viên", ACCENT_BLUE);
         btnSave.addActionListener(e -> {
             String name = tfName.getText().trim();
+            String username = tfUser.getText().trim();
+            String password = new String(pfPass.getPassword());
             if (name.isEmpty() || name.equals("Họ và tên")) {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập họ tên!");
                 return;
             }
-            // TODO: Gọi staffDAO.insert(...)
+            if (username.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập tên đăng nhập!");
+                return;
+            }
+            if (password.length() < 6) {
+                JOptionPane.showMessageDialog(this, "Mật khẩu phải có ít nhất 6 ký tự!");
+                return;
+            }
+
+            int roleId = cbRole.getSelectedIndex() == 1 ? AppConstants.ROLE_ADMIN : AppConstants.ROLE_STAFF;
+            boolean ok = userService.createUser(username, password, name, null, roleId);
+            if (!ok) {
+                JOptionPane.showMessageDialog(this, "Thêm nhân viên thất bại. Tên đăng nhập có thể đã tồn tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             JOptionPane.showMessageDialog(this, "Thêm nhân viên \"" + name + "\" thành công!");
             dispose();
         });

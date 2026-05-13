@@ -6,6 +6,13 @@ import javax.swing.table.*;
 
 import com.gym.gui.AppStyle;
 import com.gym.gui.AppStyle.RoundedBorder;
+import com.gym.entity.Member;
+import com.gym.entity.GymPackage;
+import com.gym.entity.Subscription;
+import com.gym.service.CheckInService;
+import com.gym.service.MemberService;
+import com.gym.service.PackageService;
+import com.gym.service.SubscriptionService;
 
 import java.awt.*;
 
@@ -19,6 +26,16 @@ import static com.gym.gui.AppStyle.*;
 public class CheckinPanel extends JPanel {
 
     private DefaultTableModel historyModel;
+    private JTextField tfSearch;
+    private JLabel lblName;
+    private JLabel lblPackage;
+    private JLabel lblExpiry;
+    private JLabel lblStatus;
+    private JButton btnCheckin;
+    private final MemberService memberService = new MemberService();
+    private final SubscriptionService subscriptionService = new SubscriptionService();
+    private final PackageService packageService = new PackageService();
+    private final CheckInService checkInService = new CheckInService();
 
     public CheckinPanel() {
         setBackground(BG_DARK);
@@ -48,32 +65,34 @@ public class CheckinPanel extends JPanel {
         gbc.fill    = GridBagConstraints.HORIZONTAL;
 
         JLabel lbl1       = styledLabel("Nhập mã hội viên hoặc SĐT:");
-        JTextField tfSearch = makeStyledTextField("VD: MEM26001 hoặc 09xxxxxxxx", 25);
+        tfSearch = makeStyledTextField("VD: GYM26001 hoặc 09xxxxxxxx", 25);
         JButton btnFind   = makeActionButton("🔍 Tìm kiếm", ACCENT_BLUE);
 
         gbc.gridx=0; gbc.gridy=0; gbc.gridwidth=2; formCard.add(lbl1, gbc);
         gbc.gridy=1; gbc.gridwidth=1;               formCard.add(tfSearch, gbc);
         gbc.gridx=1;                                formCard.add(btnFind, gbc);
 
-        // Kết quả tìm kiếm (giả lập)
+        // Kết quả tìm kiếm
         JPanel resultCard = new JPanel(new GridLayout(0, 2, 8, 8));
         resultCard.setBackground(new Color(35, 40, 60));
         resultCard.setBorder(new CompoundBorder(
             new RoundedBorder(ACCENT_GREEN, 1, 8),
             new EmptyBorder(12, 16, 12, 16)
         ));
-        resultCard.add(styledLabel("Họ tên:"));       resultCard.add(styledValue("Trần Thị Mai"));
-        resultCard.add(styledLabel("Gói tập:"));      resultCard.add(styledValue("Gym 3 tháng"));
-        resultCard.add(styledLabel("Hết hạn:"));      resultCard.add(styledValue("01/08/2026"));
-        resultCard.add(styledLabel("Trạng thái:"));   resultCard.add(styledValue("✅ ACTIVE - Được phép vào tập"));
+        resultCard.add(styledLabel("Họ tên:"));       lblName = styledValue("-"); resultCard.add(lblName);
+        resultCard.add(styledLabel("Gói tập:"));      lblPackage = styledValue("-"); resultCard.add(lblPackage);
+        resultCard.add(styledLabel("Hết hạn:"));      lblExpiry = styledValue("-"); resultCard.add(lblExpiry);
+        resultCard.add(styledLabel("Trạng thái:"));   lblStatus = styledValue("-"); resultCard.add(lblStatus);
 
         gbc.gridx=0; gbc.gridy=2; gbc.gridwidth=2; gbc.insets=new Insets(16, 8, 8, 8);
         formCard.add(resultCard, gbc);
 
-        JButton btnCheckin = makeActionButton("✅  XÁC NHẬN CHECK-IN", ACCENT_GREEN);
+        btnCheckin = makeActionButton("✅  XÁC NHẬN CHECK-IN", ACCENT_GREEN);
         btnCheckin.setFont(new Font("Segoe UI", Font.BOLD, 15));
         btnCheckin.setPreferredSize(new Dimension(250, 44));
-        // TODO: btnCheckin.addActionListener(e -> confirmCheckin(tfSearch.getText()));
+        btnCheckin.setEnabled(false);
+        btnFind.addActionListener(e -> doSearch());
+        btnCheckin.addActionListener(e -> confirmCheckin());
 
         gbc.gridy=3; gbc.anchor=GridBagConstraints.CENTER; gbc.insets=new Insets(12, 8, 6, 8);
         formCard.add(btnCheckin, gbc);
@@ -85,9 +104,7 @@ public class CheckinPanel extends JPanel {
         historyModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
-        historyModel.addRow(new Object[]{"1","MEM26005","Đặng Văn Tú", "Gym 3 tháng", "06:15"});
-        historyModel.addRow(new Object[]{"2","MEM26009","Bùi Thị Loan","Yoga 1 tháng","07:00"});
-        historyModel.addRow(new Object[]{"3","MEM26012","Trương Minh", "Gym VIP",     "07:45"});
+        // Lịch sử sẽ được load động từ DB (mặc định trống)
 
         JTable table = new JTable(historyModel);
         styleTableAppearance(table);
@@ -105,4 +122,48 @@ public class CheckinPanel extends JPanel {
 
     /** Xóa lịch sử để load lại từ đầu ngày. */
     public void clearHistory() { historyModel.setRowCount(0); }
+
+    private void doSearch() {
+        String query = tfSearch.getText().trim();
+        if (query.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập mã hội viên hoặc SĐT!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Member member = memberService.findByCodeOrPhone(query);
+        if (member == null) {
+            lblName.setText("Không tìm thấy");
+            lblPackage.setText("-");
+            lblExpiry.setText("-");
+            lblStatus.setText("❌ Không hợp lệ");
+            btnCheckin.setEnabled(false);
+            return;
+        }
+
+        Subscription sub = subscriptionService.getActiveSubscription(member.getId());
+        GymPackage pkg = sub != null ? packageService.getPackageById(sub.getPackageId()) : null;
+        boolean allowed = subscriptionService.isValidForCheckIn(sub);
+
+        lblName.setText(member.getFullName());
+        lblPackage.setText(pkg != null ? pkg.getPackageName() : "-");
+        lblExpiry.setText(sub != null && sub.getEndDate() != null ? sub.getEndDate().toString() : "-");
+        lblStatus.setText(allowed ? "✅ ACTIVE - Được phép" : "⛔ Không đủ điều kiện");
+        btnCheckin.setEnabled(allowed);
+    }
+
+    private void confirmCheckin() {
+        String query = tfSearch.getText().trim();
+        Member member = memberService.findByCodeOrPhone(query);
+        if (member == null) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy hội viên.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        boolean ok = checkInService.checkInByMemberId(member.getId());
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Check-in thất bại. Vui lòng kiểm tra trạng thái gói.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        addCheckinRecord(String.valueOf(historyModel.getRowCount() + 1), member.getMemberCode(), member.getFullName(), lblPackage.getText(), java.time.LocalTime.now().toString());
+        JOptionPane.showMessageDialog(this, "✅ Check-in thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+    }
 }

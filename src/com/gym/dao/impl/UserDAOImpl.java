@@ -15,6 +15,7 @@ public class UserDAOImpl extends BaseDAO implements IUserDAO {
         u.setUsername(rs.getString("username"));
         u.setPassword(rs.getString("password")); // Hash password
         u.setFullname(rs.getString("full_name"));
+        u.setPhone(rs.getString("phone"));
         u.setRoleId(rs.getInt("role_id"));
         u.setStatus(rs.getBoolean("status"));
         return u;
@@ -40,22 +41,48 @@ public class UserDAOImpl extends BaseDAO implements IUserDAO {
     }
 
     @Override
+    public User findByUsername(String username) {
+        String sql = "SELECT * FROM users WHERE username = ?";
+        List<User> users = executeQuery(sql, this::mapUser, username);
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    @Override
     public int insert(User user) {
         // Đăng ký tài khoản moi, mặc định role_id = 2 (nhân viên) và status = true (kích hoạt)
-        String sql = "INSERT INTO users (username, password, full_name, role_id, status) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, password, full_name, phone, role_id, status) VALUES (?, ?, ?, ?, ?, ?)";
 
-        return executeUpdate(sql,
-                user.getUsername(),
-                user.getPassword(),
-                user.getFullname(),
-                user.getRoleId(),
-                user.isStatus());
+        try {
+            int result = executeUpdate(sql,
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getFullname(),
+                    user.getPhone(),
+                    user.getRoleId(),
+                    user.isStatus());
+            System.out.println("✓ Insert user SUCCESS: username=" + user.getUsername() + ", rows affected=" + result);
+            return result;
+        } catch (Exception e) {
+            System.err.println("✗ Insert user FAILED: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Override
     public int updatePassword(int userId, String newPassword) {
         String sql = "UPDATE users SET password = ? WHERE id = ?";
         return executeUpdate(sql, newPassword, userId);
+    }
+
+    public int updateProfileByUsername(String username, String fullName, String phone) {
+        String sql = "UPDATE users SET full_name = ?, phone = ? WHERE username = ?";
+        return executeUpdate(sql, fullName, phone, username);
+    }
+
+    public int updatePasswordByUsername(String username, String newPassword) {
+        String sql = "UPDATE users SET password = ? WHERE username = ?";
+        return executeUpdate(sql, newPassword, username);
     }
 
     @Override

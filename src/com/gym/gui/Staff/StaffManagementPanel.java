@@ -5,6 +5,10 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 import java.awt.*;
 
+import com.gym.entity.User;
+import com.gym.service.UserService;
+import com.gym.util.AppConstants;
+
 import static com.gym.gui.AppStyle.*;
 
 /**
@@ -19,6 +23,7 @@ public class StaffManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private final JFrame owner;
+    private final UserService userService = new UserService();
 
     public StaffManagementPanel(JFrame owner) {
         this.owner = owner;
@@ -35,7 +40,10 @@ public class StaffManagementPanel extends JPanel {
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
         JButton btnAdd = makeActionButton("➕ Thêm nhân viên", ACCENT_BLUE);
-        btnAdd.addActionListener(e -> new AddStaffDialog(owner).setVisible(true));
+        btnAdd.addActionListener(e -> {
+            new AddStaffDialog(owner).setVisible(true);
+            loadStaff();
+        });
         toolBar.add(title,  BorderLayout.WEST);
         toolBar.add(btnAdd, BorderLayout.EAST);
         add(toolBar, BorderLayout.NORTH);
@@ -46,12 +54,7 @@ public class StaffManagementPanel extends JPanel {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
-        // Dữ liệu mẫu
-        tableModel.addRow(new Object[]{"U001","admin",   "Nguyễn Văn A","ADMIN","✅ Active","Sửa | Khóa"});
-        tableModel.addRow(new Object[]{"U002","staff01", "Trần Thị B",  "STAFF","✅ Active","Sửa | Khóa"});
-        tableModel.addRow(new Object[]{"U003","staff02", "Lê Văn C",    "STAFF","✅ Active","Sửa | Khóa"});
-        tableModel.addRow(new Object[]{"U004","staff03", "Phạm Thị D",  "STAFF","🔴 Locked","Sửa | Mở"});
-        tableModel.addRow(new Object[]{"U005","staff04", "Võ Minh E",   "STAFF","✅ Active","Sửa | Khóa"});
+        loadStaff();
 
         JTable table = new JTable(tableModel);
         styleTableAppearance(table);
@@ -63,4 +66,20 @@ public class StaffManagementPanel extends JPanel {
 
     /** Thêm một hàng nhân viên vào bảng. */
     public void addRow(Object[] rowData) { tableModel.addRow(rowData); }
+
+    private void loadStaff() {
+        clearData();
+        for (User u : userService.getAllStaff()) {
+            String role = u.getRoleId() == AppConstants.ROLE_ADMIN ? "ADMIN" : "STAFF";
+            String status = u.isStatus() ? "✅ Active" : "🔴 Locked";
+            addRow(new Object[]{
+                    "U" + u.getId(),
+                    u.getUsername(),
+                    u.getFullname(),
+                    role,
+                    status,
+                    "Sửa | Khóa"
+            });
+        }
+    }
 }
