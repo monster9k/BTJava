@@ -6,8 +6,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+import com.gym.auth.AuthService;
+import com.gym.auth.UserSession;
+import com.gym.entity.User;
 import com.gym.gui.Admin.AdminDashboard;
 import com.gym.gui.Staff.*;
+import com.gym.util.AppConstants;
 
 
 /**
@@ -24,6 +28,7 @@ public class LoginJFram extends JFrame {
     private JButton btnLogin;
     private JLabel lblError;
     private JButton btnRegister; // New register button
+    private final AuthService authService = new AuthService();
 
     public LoginJFram() {
         initComponents();
@@ -49,27 +54,36 @@ public class LoginJFram extends JFrame {
             return;
         }
 
-        String role = Authenticate(username, password);
-        if (role == null) {
+        boolean ok = authService.login(username, password);
+        if (!ok) {
             lblError.setText("Sai tên đăng nhập hoặc mật khẩu!");
-            txtPassword.setText(""); // Clear password
-        } else {
-            lblError.setText(" ");
-            this.dispose();
-
-            if (role.equals("ADMIN")) {
-                new AdminDashboard(username).setVisible(true);
-            } else if (role.equals("STAFF")) {
-                JOptionPane.showMessageDialog(this, "Chào mừng Staff: " + username);
-                new StaffDashboard(username,"LXP").setVisible(true);
-            }
+            txtPassword.setText("");
+            return;
         }
-    }
 
-    private String Authenticate(String user, String pass) {
-        if (user.equals("admin") && pass.equals("123")) return "ADMIN";
-        if (user.equals("staff") && pass.equals("123")) return "STAFF";
-        return null;
+        User currentUser = UserSession.getCurrentUser();
+        if (currentUser == null) {
+            lblError.setText("Không thể tạo phiên đăng nhập, vui lòng thử lại!");
+            txtPassword.setText("");
+            return;
+        }
+
+        lblError.setText(" ");
+        this.dispose();
+
+        String displayName = currentUser.getFullname();
+        if (displayName == null || displayName.trim().isEmpty()) {
+            displayName = currentUser.getUsername();
+        }
+
+        if (currentUser.getRoleId() == AppConstants.ROLE_ADMIN) {
+            new AdminDashboard(displayName).setVisible(true);
+        } else if (currentUser.getRoleId() == AppConstants.ROLE_STAFF) {
+            JOptionPane.showMessageDialog(this, "Chào mừng Staff: " + displayName);
+            new StaffDashboard(currentUser.getUsername(), displayName).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Tài khoản không có quyền truy cập!");
+        }
     }
 
     // New registration handler
@@ -199,7 +213,7 @@ public class LoginJFram extends JFrame {
     }
 
     // New Registration Dialog Class
-    private static class RegisterDialog extends JDialog {
+    private class RegisterDialog extends JDialog {
         private JTextField txtRegUsername, txtRegFullname;
         private JPasswordField txtRegPassword, txtRegConfirmPassword;
         private JButton btnRegister, btnCancel;
@@ -354,17 +368,23 @@ public class LoginJFram extends JFrame {
                 return;
             }
 
-            // Check if username already exists
-            if (username.equals("admin") || username.equals("staff")) {
+            // Check if username already exists in database
+            boolean usernameExists = authService.checkUsernameExists(username);
+            if (usernameExists) {
                 lblRegError.setText("Tên đăng nhập đã tồn tại!");
                 return;
             }
 
-            // Success
-            JOptionPane.showMessageDialog(this, 
-                "Đăng ký thành công!\nTài khoản: " + username + "\nHọ tên: " + fullname,
+            boolean created = authService.register(username, password, fullname, AppConstants.ROLE_STAFF);
+            if (!created) {
+                lblRegError.setText("Đăng ký thất bại, vui lòng thử lại!");
+                return;
+            }
+
+            JOptionPane.showMessageDialog(this,
+                "Đăng ký thành công!\nTài khoản: " + username + "\nHọ tên: " + fullname + "\n\nBây giờ bạn có thể đăng nhập.",
                 "Thành công", JOptionPane.INFORMATION_MESSAGE);
-            
+
             this.dispose();
         }
        }

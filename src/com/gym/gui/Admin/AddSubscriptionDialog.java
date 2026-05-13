@@ -5,8 +5,19 @@ import javax.swing.border.*;
 
 import com.gym.gui.AppStyle;
 import com.gym.gui.AppStyle.RoundedBorder;
+import com.gym.entity.GymPackage;
+import com.gym.entity.Member;
+import com.gym.service.MemberService;
+import com.gym.service.PackageService;
+import com.gym.service.SubscriptionService;
+import com.gym.util.AppConstants;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
 
 import static com.gym.gui.AppStyle.*;
 
@@ -33,23 +44,48 @@ public class AddSubscriptionDialog extends JDialog {
         gbc.weightx = 1.0;
         gbc.gridx   = 0;
 
-        JTextField tfMemberId = makeStyledTextField("Nhập mã hội viên (VD: MEM26001)", 20);
+        MemberService memberService = new MemberService();
+        PackageService packageService = new PackageService();
+        SubscriptionService subscriptionService = new SubscriptionService();
+        NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
 
-        String[] packages = {
-            "P01 - Gym 1 tháng  (30 ngày  - 350,000đ)",
-            "P02 - Gym 3 tháng  (90 ngày  - 900,000đ)",
-            "P03 - Gym 6 tháng  (180 ngày - 1,600,000đ)",
-            "P04 - Gym VIP      (30 ngày  - 800,000đ)",
-            "P05 - Yoga 1 tháng (30 ngày  - 400,000đ)",
-            "P06 - Zumba        (30 ngày  - 350,000đ)",
-        };
-        JComboBox<String> cbPackage = makeStyledCombo(packages);
+        JTextField tfMemberId = makeStyledTextField("Nhập mã hội viên (VD: GYM26001)", 20);
 
-        JSpinner  spStartDate   = makeDatePicker();
-        JTextField tfPrice      = makeStyledTextField("Giá thực tế (VD: 850000)", 20);
+        List<GymPackage> pkgList = packageService.getActivePackages();
+        DefaultComboBoxModel<PackageItem> pkgModel = new DefaultComboBoxModel<>();
+        for (GymPackage p : pkgList) {
+            pkgModel.addElement(new PackageItem(p));
+        }
+        JComboBox<PackageItem> cbPackage = new JComboBox<>(pkgModel);
+        cbPackage.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            JLabel lbl = new JLabel(value != null ? value.getDisplay() : "");
+            lbl.setOpaque(true);
+            lbl.setBackground(isSelected ? new Color(45, 55, 85) : new Color(35, 40, 60));
+            lbl.setForeground(TEXT_WHITE);
+            lbl.setBorder(new EmptyBorder(6, 10, 6, 10));
+            return lbl;
+        });
+
+        JSpinner spStartDate = makeDatePicker();
+        spStartDate.setEnabled(false);
+        spStartDate.setValue(java.sql.Date.valueOf(LocalDate.now()));
+
+        JTextField tfPrice = makeStyledTextField("Giá theo gói", 20);
+        tfPrice.setEditable(false);
 
         String[] paymentStatuses = {"1 - Đã thanh toán", "0 - Chưa thanh toán"};
         JComboBox<String> cbPayment = makeStyledCombo(paymentStatuses);
+
+        if (pkgModel.getSize() > 0) {
+            PackageItem item = pkgModel.getElementAt(0);
+            tfPrice.setText(currencyFormat.format(item.getPrice()));
+        }
+        cbPackage.addActionListener(e -> {
+            PackageItem item = (PackageItem) cbPackage.getSelectedItem();
+            if (item != null) {
+                tfPrice.setText(currencyFormat.format(item.getPrice()));
+            }
+        });
 
         JLabel noteLabel = new JLabel("* Ngày hết hạn tự tính theo thời hạn của gói đã chọn.");
         noteLabel.setFont(FONT_SMALL);
@@ -89,23 +125,64 @@ public class AddSubscriptionDialog extends JDialog {
 
         JButton btnSave = makeActionButton("💾 Lưu đăng ký", ACCENT_ORANGE);
         btnSave.addActionListener(e -> {
-            String memberId = tfMemberId.getText().trim();
-            String price    = tfPrice.getText().trim();
-            if (memberId.isEmpty() || memberId.contains("Nhập mã")) {
+            String memberCode = tfMemberId.getText().trim();
+            if (memberCode.isEmpty() || memberCode.contains("Nhập mã")) {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập mã hội viên!", "Lỗi", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            if (price.isEmpty() || price.contains("Giá thực tế")) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập giá thực tế!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+
+            PackageItem selected = (PackageItem) cbPackage.getSelectedItem();
+            if (selected == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn gói tập!", "Lỗi", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            // TODO: Gọi subscriptionDAO.insert(...)
-            JOptionPane.showMessageDialog(this, "Đăng ký gói tập thành công!\nHội viên: " + memberId, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+
+            Member member = memberService.getMemberByCode(memberCode);
+            if (member == null) {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy hội viên với mã: " + memberCode, "Lỗi", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int paymentStatus = cbPayment.getSelectedIndex() == 0 ? AppConstants.PAYMENT_PAID : AppConstants.PAYMENT_UNPAID;
+            boolean ok = subscriptionService.registerPackageWithPayment(member.getId(), selected.getId(), paymentStatus);
+            if (!ok) {
+                JOptionPane.showMessageDialog(this, "Đăng ký gói tập thất bại. Vui lòng kiểm tra dữ liệu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            JOptionPane.showMessageDialog(this, "Đăng ký gói tập thành công!\nHội viên: " + memberCode, "Thành công", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         });
 
         gbc.gridy  = row;
         gbc.insets = new Insets(12, 15, 15, 15);
         add(btnSave, gbc);
+    }
+
+    private static class PackageItem {
+        private final int id;
+        private final String name;
+        private final int duration;
+        private final BigDecimal price;
+
+        PackageItem(GymPackage pkg) {
+            this.id = pkg.getId();
+            this.name = pkg.getPackageName();
+            this.duration = pkg.getDurationDays();
+            this.price = pkg.getPrice();
+        }
+
+        int getId() {
+            return id;
+        }
+
+        BigDecimal getPrice() {
+            return price != null ? price : BigDecimal.ZERO;
+        }
+
+        String getDisplay() {
+            String priceText = NumberFormat.getInstance(new Locale("vi", "VN")).format(getPrice());
+            return String.format("%s - %s (%d ngày - %sđ)", id, name, duration, priceText);
+        }
     }
 }

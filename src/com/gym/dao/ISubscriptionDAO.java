@@ -3,6 +3,8 @@ import com.gym.entity.Subscription;
 import java.util.List;
 
 public interface ISubscriptionDAO {
+    List<Subscription> findAll();
+    Subscription findById(int id);
     List<Subscription> findByMemberId(int memberId);
     Subscription findActiveSubscription(int memberId); // Tìm gói đang còn hạn của khách
 
@@ -12,4 +14,8 @@ public interface ISubscriptionDAO {
 
     // Phục vụ báo cáo
     List<Subscription> findExpiringSoon(int days);
+    List<Subscription> findByMonth(int year, int month);
+    java.math.BigDecimal sumRevenueByMonth(int year, int month);
+    int countPaidByMonth(int year, int month);
+    int countUnpaidByMonth(int year, int month);
 }

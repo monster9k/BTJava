@@ -4,6 +4,12 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import com.gym.entity.GymPackage;
+import com.gym.service.PackageService;
 
 import static com.gym.gui.AppStyle.*;
 
@@ -15,12 +21,17 @@ public class PackageManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private final JFrame owner;
+    private PackageService packageService;
+    private NumberFormat currencyFormat;
 
     public PackageManagementPanel(JFrame owner) {
         this.owner = owner;
+        this.packageService = new PackageService();
+        this.currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
         setBackground(BG_DARK);
         setLayout(new BorderLayout(0, 16));
         build();
+        loadPackagesFromDB();
     }
 
     private void build() {
@@ -42,18 +53,41 @@ public class PackageManagementPanel extends JPanel {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
-        // Dữ liệu mẫu
-        tableModel.addRow(new Object[]{"P01","Gym 1 tháng",  "30",  "350,000",   "Tập gym cơ bản",    "✅ Active","Sửa"});
-        tableModel.addRow(new Object[]{"P02","Gym 3 tháng",  "90",  "900,000",   "Tiết kiệm 14%",     "✅ Active","Sửa"});
-        tableModel.addRow(new Object[]{"P03","Gym 6 tháng",  "180", "1,600,000", "Tiết kiệm 24%",     "✅ Active","Sửa"});
-        tableModel.addRow(new Object[]{"P04","Gym VIP",      "30",  "800,000",   "PT + phòng riêng",  "✅ Active","Sửa"});
-        tableModel.addRow(new Object[]{"P05","Yoga 1 tháng", "30",  "400,000",   "Lớp Yoga buổi sáng","✅ Active","Sửa"});
-        tableModel.addRow(new Object[]{"P06","Zumba",        "30",  "350,000",   "Lớp Zumba Dance",   "✅ Active","Sửa"});
-        tableModel.addRow(new Object[]{"P07","Combo VIP",    "365", "5,000,000", "Gym + Yoga trọn năm","🔴 Ẩn",   "Sửa"});
-
         JTable table = new JTable(tableModel);
         styleTableAppearance(table);
         add(makeScrollPane(table), BorderLayout.CENTER);
+    }
+
+    /**
+     * Load dữ liệu package từ database
+     */
+    private void loadPackagesFromDB() {
+        try {
+            clearData();
+            java.util.List<GymPackage> packages = packageService.getAllPackages();
+
+            for (GymPackage pkg : packages) {
+                String status = pkg.isStatus() ? "✅ Active" : "🔴 Ẩn";
+                String price = currencyFormat.format(pkg.getPrice().doubleValue());
+
+                tableModel.addRow(new Object[]{
+                    pkg.getId(),
+                    pkg.getPackageName(),
+                    pkg.getDurationDays(),
+                    price,
+                    pkg.getDescription() != null ? pkg.getDescription() : "",
+                    status,
+                    "Sửa"
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Lỗi tải dữ liệu gói tập: " + e.getMessage(),
+                "Lỗi Database",
+                JOptionPane.ERROR_MESSAGE);
+            System.err.println("Error loading packages: " + e);
+            e.printStackTrace();
+        }
     }
 
     public void clearData() { tableModel.setRowCount(0); }

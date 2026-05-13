@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 
+import com.gym.entity.User;
+import com.gym.service.UserService;
+
 import static com.gym.gui.AppStyle.*;
 
 /**
@@ -17,6 +20,7 @@ import static com.gym.gui.AppStyle.*;
 public class StaffProfilePanel extends JPanel {
 
     private final String         username;
+    private final UserService userService = new UserService();
 
     private JTextField     tfDisplayName;
     private JTextField     tfPhone;
@@ -28,7 +32,12 @@ public class StaffProfilePanel extends JPanel {
         this.username = username;
         setBackground(BG_DARK);
         setLayout(new BorderLayout(0, 16));
-        build(displayName);
+        User u = userService.getByUsername(username);
+        String resolvedName = u != null ? u.getFullname() : displayName;
+        build(resolvedName);
+        if (u != null && u.getPhone() != null) {
+            tfPhone.setText(u.getPhone());
+        }
     }
 
     // ===================================================================
@@ -206,7 +215,11 @@ public class StaffProfilePanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Tên hiển thị không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // TODO: userDAO.updateProfile(username, newName, newPhone)
+        boolean ok = userService.updateProfile(username, newName, newPhone);
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Cập nhật thông tin thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         JOptionPane.showMessageDialog(this,
             "✅  Đã lưu thông tin!\nTên: " + newName + "\nSĐT: " + newPhone,
             "Thành công", JOptionPane.INFORMATION_MESSAGE);
@@ -228,7 +241,11 @@ public class StaffProfilePanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Mật khẩu xác nhận không khớp!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // TODO: userDAO.changePassword(username, oldP, newP)
+        boolean ok = userService.changePassword(username, oldP, newP);
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Đổi mật khẩu thất bại. Mật khẩu cũ không đúng.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         pfOldPwd.setText("");
         pfNewPwd.setText("");
         pfConfirmPwd.setText("");
