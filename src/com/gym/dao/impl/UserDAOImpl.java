@@ -24,7 +24,7 @@ public class UserDAOImpl extends BaseDAO implements IUserDAO {
 
     @Override
     public List<User> findAllStaff() {
-        String sql = "SELECT * FROM users WHERE role_id != 1"; // Lấy tất cả user có role_id khác 1 (admin)
+        String sql = "SELECT * FROM users WHERE role_id = 2"; // Chỉ lấy staff
         return executeQuery(sql, this::mapUser);
     }
 
@@ -44,6 +44,13 @@ public class UserDAOImpl extends BaseDAO implements IUserDAO {
     public User findByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
         List<User> users = executeQuery(sql, this::mapUser, username);
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    @Override
+    public User findById(int id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        List<User> users = executeQuery(sql, this::mapUser, id);
         return users.isEmpty() ? null : users.get(0);
     }
 
@@ -78,6 +85,11 @@ public class UserDAOImpl extends BaseDAO implements IUserDAO {
     public int updateProfileByUsername(String username, String fullName, String phone) {
         String sql = "UPDATE users SET full_name = ?, phone = ? WHERE username = ?";
         return executeUpdate(sql, fullName, phone, username);
+    }
+
+    public int updateProfileById(int userId, String fullName, String phone) {
+        String sql = "UPDATE users SET full_name = ?, phone = ? WHERE id = ?";
+        return executeUpdate(sql, fullName, phone, userId);
     }
 
     public int updatePasswordByUsername(String username, String newPassword) {

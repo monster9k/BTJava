@@ -10,6 +10,7 @@ import com.gym.auth.AuthService;
 import com.gym.auth.UserSession;
 import com.gym.entity.User;
 import com.gym.gui.Admin.AdminDashboard;
+import com.gym.gui.Member.MemberDashboard;
 import com.gym.gui.Staff.*;
 import com.gym.util.AppConstants;
 
@@ -81,6 +82,8 @@ public class LoginJFram extends JFrame {
         } else if (currentUser.getRoleId() == AppConstants.ROLE_STAFF) {
             JOptionPane.showMessageDialog(this, "Chào mừng Staff: " + displayName);
             new StaffDashboard(currentUser.getUsername(), displayName).setVisible(true);
+        } else if (currentUser.getRoleId() == AppConstants.ROLE_MEMBER) {
+            new MemberDashboard(currentUser).setVisible(true);
         } else {
             JOptionPane.showMessageDialog(this, "Tài khoản không có quyền truy cập!");
         }
@@ -214,7 +217,7 @@ public class LoginJFram extends JFrame {
 
     // New Registration Dialog Class
     private class RegisterDialog extends JDialog {
-        private JTextField txtRegUsername, txtRegFullname;
+        private JTextField txtRegUsername, txtRegFullname, txtRegPhone;
         private JPasswordField txtRegPassword, txtRegConfirmPassword;
         private JButton btnRegister, btnCancel;
         private JLabel lblRegError;
@@ -251,6 +254,14 @@ public class LoginJFram extends JFrame {
             txtRegFullname = new JTextField();
             txtRegFullname.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
             txtRegFullname.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // Phone
+            JLabel lblPhone = new JLabel("Số điện thoại:");
+            lblPhone.setFont(new Font("Tahoma", Font.BOLD, 12));
+            lblPhone.setAlignmentX(Component.CENTER_ALIGNMENT);
+            txtRegPhone = new JTextField();
+            txtRegPhone.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+            txtRegPhone.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             // Username
             JLabel lblUsername = new JLabel("Tên đăng nhập:");
@@ -320,6 +331,10 @@ public class LoginJFram extends JFrame {
             form.add(Box.createRigidArea(new Dimension(0, 5)));
             form.add(txtRegFullname);
             form.add(Box.createRigidArea(new Dimension(0, 15)));
+            form.add(lblPhone);
+            form.add(Box.createRigidArea(new Dimension(0, 5)));
+            form.add(txtRegPhone);
+            form.add(Box.createRigidArea(new Dimension(0, 15)));
             form.add(lblUsername);
             form.add(Box.createRigidArea(new Dimension(0, 5)));
             form.add(txtRegUsername);
@@ -347,6 +362,7 @@ public class LoginJFram extends JFrame {
 
         private void handleRegister() {
             String fullname = txtRegFullname.getText().trim();
+            String phone = txtRegPhone.getText().trim();
             String username = txtRegUsername.getText().trim();
             String password = new String(txtRegPassword.getPassword());
             String confirmPassword = new String(txtRegConfirmPassword.getPassword());
@@ -375,7 +391,7 @@ public class LoginJFram extends JFrame {
                 return;
             }
 
-            boolean created = authService.register(username, password, fullname, AppConstants.ROLE_STAFF);
+            boolean created = authService.register(username, password, fullname, phone, AppConstants.ROLE_MEMBER);
             if (!created) {
                 lblRegError.setText("Đăng ký thất bại, vui lòng thử lại!");
                 return;
@@ -389,3 +405,5 @@ public class LoginJFram extends JFrame {
         }
        }
     }
+
+

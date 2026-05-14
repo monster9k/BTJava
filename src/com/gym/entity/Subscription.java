@@ -2,6 +2,7 @@ package com.gym.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Subscription {
     private int id;
@@ -12,6 +13,7 @@ public class Subscription {
     private java.math.BigDecimal priceAtPurchase; // Giá snapshot lúc bán
     private int status; // 1: Active, 2: Expired, 3: Canceled
     private int paymentStatus; // 1: Paid, 0: Unpaid
+    private java.time.LocalDateTime createdAt;
 
     public int getId() {
         return id;
@@ -75,5 +77,13 @@ public class Subscription {
 
     public void setPaymentStatus(int paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

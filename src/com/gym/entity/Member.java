@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public class Member {
     private int id;
+    private Integer userId;
     private String memberCode;
     private String fullName;
     private String phone;
@@ -18,6 +19,14 @@ public class Member {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getMemberCode() {

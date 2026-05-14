@@ -6,6 +6,7 @@ public interface IMemberDAO {
     List<Member> findAll();
     Member findById(int id);
     Member findByCode(String code); // Tìm kiếm nhanh khi check-in
+    Member findByUserId(int userId);
     List<Member> searchByNameOrPhone(String keyword);
 
     int insert(Member member);

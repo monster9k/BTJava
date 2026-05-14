@@ -20,6 +20,10 @@ public class SubscriptionDAOImpl extends BaseDAO implements ISubscriptionDAO {
         s.setPriceAtPurchase(rs.getBigDecimal("price_at_purchase"));
         s.setStatus(rs.getInt("status"));
         s.setPaymentStatus(rs.getInt("payment_status"));
+        java.sql.Timestamp created = rs.getTimestamp("created_at");
+        if (created != null) {
+            s.setCreatedAt(created.toLocalDateTime());
+        }
         return s;
     }
 
@@ -53,6 +57,13 @@ public class SubscriptionDAOImpl extends BaseDAO implements ISubscriptionDAO {
     }
 
     @Override
+    public Subscription findLatestByMemberId(int memberId) {
+        String sql = "SELECT * FROM subscriptions WHERE member_id = ? ORDER BY start_date DESC, id DESC LIMIT 1";
+        List<Subscription> list = executeQuery(sql, this::mapSubscription, memberId);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    @Override
     public int register(Subscription sub) {
         String sql = "INSERT INTO subscriptions (member_id, package_id, start_date, end_date, price_at_purchase, status, payment_status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -70,6 +81,12 @@ public class SubscriptionDAOImpl extends BaseDAO implements ISubscriptionDAO {
     public int updatePaymentStatus(int subId, int paymentStatus) {
         String sql = "UPDATE subscriptions SET payment_status = ? WHERE id = ?";
         return executeUpdate(sql, paymentStatus, subId);
+    }
+
+    @Override
+    public int updateStatus(int subId, int status) {
+        String sql = "UPDATE subscriptions SET status = ? WHERE id = ?";
+        return executeUpdate(sql, status, subId);
     }
 
     @Override
@@ -121,4 +138,3 @@ public class SubscriptionDAOImpl extends BaseDAO implements ISubscriptionDAO {
         return list.isEmpty() ? 0 : list.get(0);
     }
 }
-

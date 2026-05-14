@@ -22,6 +22,8 @@ import static com.gym.gui.AppStyle.*;
 public class StaffManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
+    private JTable table;
+    private java.util.List<User> cachedStaff;
     private final JFrame owner;
     private final UserService userService = new UserService();
 
@@ -49,15 +51,25 @@ public class StaffManagementPanel extends JPanel {
         add(toolBar, BorderLayout.NORTH);
 
         // --- Table ---
-        String[] cols = {"ID", "Tên đăng nhập", "Họ tên", "Vai trò", "Trạng thái", "Thao tác"};
+        String[] cols = {"ID", "Tên đăng nhập", "Họ tên", "SĐT", "Vai trò", "Trạng thái", "Thao tác"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
         loadStaff();
 
-        JTable table = new JTable(tableModel);
+        table = new JTable(tableModel);
         styleTableAppearance(table);
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (row >= 0 && col == 6) {
+                    showActionMenu(row, e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
         add(makeScrollPane(table), BorderLayout.CENTER);
     }
 
@@ -69,17 +81,43 @@ public class StaffManagementPanel extends JPanel {
 
     private void loadStaff() {
         clearData();
-        for (User u : userService.getAllStaff()) {
+        cachedStaff = userService.getAllStaff();
+        for (User u : cachedStaff) {
             String role = u.getRoleId() == AppConstants.ROLE_ADMIN ? "ADMIN" : "STAFF";
             String status = u.isStatus() ? "✅ Active" : "🔴 Locked";
             addRow(new Object[]{
                     "U" + u.getId(),
                     u.getUsername(),
                     u.getFullname(),
+                    u.getPhone(),
                     role,
                     status,
                     "Sửa | Khóa"
             });
         }
+    }
+
+    private void showActionMenu(int row, Component invoker, int x, int y) {
+        if (cachedStaff == null || row >= cachedStaff.size()) {
+            return;
+        }
+        User selected = cachedStaff.get(row);
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem edit = new JMenuItem("Sửa thông tin");
+        edit.addActionListener(e -> {
+            new EditStaffDialog(owner, selected).setVisible(true);
+            loadStaff();
+        });
+        JMenuItem toggle = new JMenuItem(selected.isStatus() ? "Khóa tài khoản" : "Mở khóa tài khoản");
+        toggle.addActionListener(e -> {
+            boolean ok = userService.toggleUserStatus(selected.getId(), !selected.isStatus());
+            if (!ok) {
+                JOptionPane.showMessageDialog(this, "Cập nhật trạng thái thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+            loadStaff();
+        });
+        menu.add(edit);
+        menu.add(toggle);
+        menu.show(invoker, x, y);
     }
 }

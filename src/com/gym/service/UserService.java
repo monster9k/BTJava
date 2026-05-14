@@ -25,6 +25,13 @@ public class UserService {
         return userDAO.findByUsername(username.trim());
     }
 
+    public User getById(int id) {
+        if (id <= 0) {
+            return null;
+        }
+        return userDAO.findById(id);
+    }
+
     public List<User> getAllStaff() {
         return userDAO.findAllStaff();
     }
@@ -68,6 +75,16 @@ public class UserService {
         return userDAO.updateProfileByUsername(username.trim(), fullName.trim(), phone != null ? phone.trim() : null) > 0;
     }
 
+    public boolean updateProfileById(int userId, String fullName, String phone) {
+        if (userId <= 0) {
+            return false;
+        }
+        if (fullName == null || fullName.trim().isEmpty()) {
+            return false;
+        }
+        return userDAO.updateProfileById(userId, fullName.trim(), phone != null ? phone.trim() : null) > 0;
+    }
+
     public boolean changePassword(String username, String oldRawPassword, String newRawPassword) {
         if (username == null || username.trim().isEmpty()) {
             return false;
@@ -100,5 +117,39 @@ public class UserService {
         String newHashed = SecurityUtil.hashPassword(newRawPassword);
         return userDAO.updatePasswordByUsername(username.trim(), newHashed) > 0;
     }
-}
 
+    public User createMemberUser(String username, String rawPassword, String fullName, String phone) {
+        if (username == null || username.trim().isEmpty()) {
+            return null;
+        }
+        if (rawPassword == null || rawPassword.length() < 6) {
+            return null;
+        }
+        if (fullName == null || fullName.trim().isEmpty()) {
+            return null;
+        }
+        if (userDAO.findByUsername(username.trim()) != null) {
+            return null;
+        }
+
+        User u = new User();
+        u.setUsername(username.trim());
+        u.setPassword(SecurityUtil.hashPassword(rawPassword));
+        u.setFullname(fullName.trim());
+        u.setPhone(phone != null ? phone.trim() : null);
+        u.setRoleId(AppConstants.ROLE_MEMBER);
+        u.setStatus(AppConstants.USER_ACTIVE);
+
+        if (userDAO.insert(u) <= 0) {
+            return null;
+        }
+        return userDAO.findByUsername(username.trim());
+    }
+
+    public boolean toggleUserStatus(int userId, boolean status) {
+        if (userId <= 0) {
+            return false;
+        }
+        return userDAO.toggleUserStatus(userId, status) > 0;
+    }
+}

@@ -4,6 +4,7 @@ public class AppConstants {
     // Role IDs
     public static final int ROLE_ADMIN = 1;
     public static final int ROLE_STAFF = 2;
+    public static final int ROLE_MEMBER = 3;
 
     // User Status
     public static final boolean USER_ACTIVE = true;
@@ -18,6 +19,7 @@ public class AppConstants {
     public static final boolean PACKAGE_INACTIVE = false;
 
     // Subscription Status
+    public static final int SUBSCRIPTION_PENDING = 0;
     public static final int SUBSCRIPTION_ACTIVE = 1;
     public static final int SUBSCRIPTION_EXPIRED = 2;
     public static final int SUBSCRIPTION_CANCELED = 3;

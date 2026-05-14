@@ -144,7 +144,7 @@ public class CheckinPanel extends JPanel {
         GymPackage pkg = sub != null ? packageService.getPackageById(sub.getPackageId()) : null;
         boolean allowed = subscriptionService.isValidForCheckIn(sub);
 
-        lblName.setText(member.getFullName());
+        lblName.setText(memberService.resolveDisplayName(member));
         lblPackage.setText(pkg != null ? pkg.getPackageName() : "-");
         lblExpiry.setText(sub != null && sub.getEndDate() != null ? sub.getEndDate().toString() : "-");
         lblStatus.setText(allowed ? "✅ ACTIVE - Được phép" : "⛔ Không đủ điều kiện");
@@ -163,7 +163,7 @@ public class CheckinPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Check-in thất bại. Vui lòng kiểm tra trạng thái gói.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        addCheckinRecord(String.valueOf(historyModel.getRowCount() + 1), member.getMemberCode(), member.getFullName(), lblPackage.getText(), java.time.LocalTime.now().toString());
+        addCheckinRecord(String.valueOf(historyModel.getRowCount() + 1), member.getMemberCode(), memberService.resolveDisplayName(member), lblPackage.getText(), java.time.LocalTime.now().toString());
         JOptionPane.showMessageDialog(this, "✅ Check-in thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
     }
 }

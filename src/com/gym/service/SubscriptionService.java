@@ -41,10 +41,14 @@ public class SubscriptionService {
     }
 
     /**
-     * Lấy gói đang còn hạn của thành viên (active + paid)
+     * Lấy gói đang còn hạn của thành viên (status = ACTIVE)
      */
     public Subscription getActiveSubscription(int memberId) {
         return subscriptionDAO.findActiveSubscription(memberId);
+    }
+
+    public Subscription getLatestSubscription(int memberId) {
+        return subscriptionDAO.findLatestByMemberId(memberId);
     }
 
     /**
@@ -57,13 +61,18 @@ public class SubscriptionService {
      * - payment_status = UNPAID (mặc định)
      */
     public boolean registerPackage(int memberId, int packageId) {
-        return registerPackageWithPayment(memberId, packageId, AppConstants.PAYMENT_UNPAID);
+        return registerPackageInternal(memberId, packageId, AppConstants.SUBSCRIPTION_ACTIVE, AppConstants.PAYMENT_UNPAID);
     }
 
-    /**
-     * Đăng ký gói với trạng thái thanh toán
-     */
+    public boolean registerPackagePending(int memberId, int packageId) {
+        return registerPackageInternal(memberId, packageId, AppConstants.SUBSCRIPTION_PENDING, AppConstants.PAYMENT_UNPAID);
+    }
+
     public boolean registerPackageWithPayment(int memberId, int packageId, int paymentStatus) {
+        return registerPackageInternal(memberId, packageId, AppConstants.SUBSCRIPTION_ACTIVE, paymentStatus);
+    }
+
+    private boolean registerPackageInternal(int memberId, int packageId, int status, int paymentStatus) {
         // Validate
         if (packageId <= 0 || memberId <= 0) {
             System.out.println("ID không hợp lệ");
@@ -80,15 +89,15 @@ public class SubscriptionService {
         Subscription sub = new Subscription();
         sub.setMemberId(memberId);
         sub.setPackageId(packageId);
-        
+
         LocalDate startDate = LocalDate.now();
         int duration = packageService.getPackageDuration(packageId);
         LocalDate endDate = startDate.plusDays(duration);
-        
+
         sub.setStartDate(startDate);
         sub.setEndDate(endDate);
         sub.setPriceAtPurchase(packageService.getPackagePrice(packageId));
-        sub.setStatus(AppConstants.SUBSCRIPTION_ACTIVE);
+        sub.setStatus(status);
         sub.setPaymentStatus(paymentStatus);
 
         int result = subscriptionDAO.register(sub);
@@ -155,6 +164,11 @@ public class SubscriptionService {
         return result > 0;
     }
 
+    public boolean updateStatus(int subscriptionId, int status) {
+        int result = subscriptionDAO.updateStatus(subscriptionId, status);
+        return result > 0;
+    }
+
     /**
      * Đánh dấu subscription là PAID
      */
@@ -203,4 +217,3 @@ public class SubscriptionService {
         return getExpiringSubscriptions(AppConstants.REPORT_EXPIRING_DAYS);
     }
 }
-

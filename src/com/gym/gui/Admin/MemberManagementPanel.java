@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import com.gym.entity.Member;
 import com.gym.service.MemberService;
+import com.gym.service.UserService;
 
 import static com.gym.gui.AppStyle.*;
 
@@ -18,8 +19,11 @@ import static com.gym.gui.AppStyle.*;
 public class MemberManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
+    private JTable table;
+    private java.util.List<Member> cachedMembers;
     private final JFrame owner;
     private final MemberService memberService = new MemberService();
+    private final UserService userService = new UserService();
     private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public MemberManagementPanel(JFrame owner) {
@@ -57,15 +61,25 @@ public class MemberManagementPanel extends JPanel {
         add(header, BorderLayout.NORTH);
 
         // --- Table ---
-        String[] cols = {"Mã HV","Họ tên","SĐT","Giới tính","Ngày sinh","Ngày đăng ký","Trạng thái","Thao tác"};
+        String[] cols = {"Mã HV","Họ tên","Tài khoản","SĐT","Giới tính","Ngày sinh","Ngày đăng ký","Trạng thái","Thao tác"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
         loadMembers(memberService.getAllMembers());
 
-        JTable table = new JTable(tableModel);
+        table = new JTable(tableModel);
         styleTableAppearance(table);
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (row >= 0 && col == 8) {
+                    showActionMenu(row, e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
         add(makeScrollPane(table), BorderLayout.CENTER);
     }
 
@@ -74,14 +88,23 @@ public class MemberManagementPanel extends JPanel {
 
     private void loadMembers(java.util.List<Member> members) {
         clearData();
+        cachedMembers = members;
         for (Member m : members) {
             String birth = m.getBirthday() != null ? m.getBirthday().format(dateFmt) : "";
             String created = m.getCreatedAt() != null ? m.getCreatedAt().toLocalDate().format(dateFmt) : "";
             String status = m.isStatus() ? "✅ Active" : "🔴 Đã khóa";
+            String username = "";
+            if (m.getUserId() != null) {
+                com.gym.entity.User u = userService.getById(m.getUserId());
+                if (u != null) {
+                    username = u.getUsername();
+                }
+            }
             addRow(new Object[]{
                     m.getMemberCode(),
-                    m.getFullName(),
-                    m.getPhone(),
+                    memberService.resolveDisplayName(m),
+                    username,
+                    memberService.resolvePhone(m),
                     m.getGender(),
                     birth,
                     created,
@@ -89,5 +112,45 @@ public class MemberManagementPanel extends JPanel {
                     "Sửa | Xóa"
             });
         }
+    }
+
+    private void showActionMenu(int row, Component invoker, int x, int y) {
+        if (cachedMembers == null || row >= cachedMembers.size()) {
+            return;
+        }
+        Member selected = cachedMembers.get(row);
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem edit = new JMenuItem("Sửa thông tin");
+        edit.addActionListener(e -> {
+            new EditMemberDialog(owner, selected).setVisible(true);
+            loadMembers(memberService.getAllMembers());
+        });
+        JMenuItem deactivate = new JMenuItem("Xóa (khóa)");
+        deactivate.addActionListener(e -> handleDeactivate(selected));
+        menu.add(edit);
+        menu.add(deactivate);
+        menu.show(invoker, x, y);
+    }
+
+    private void handleDeactivate(Member member) {
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có chắc muốn khóa hội viên này?",
+                "Xác nhận",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+        boolean ok = memberService.deactivateMember(member.getId());
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Khóa hội viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (member.getUserId() != null) {
+            userService.toggleUserStatus(member.getUserId(), false);
+        }
+        loadMembers(memberService.getAllMembers());
     }
 }

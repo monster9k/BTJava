@@ -364,7 +364,7 @@ public class StaffCheckinPanel extends JPanel {
             Member m = memberService.getMemberById(s.getMemberId());
             GymPackage p = packageService.getPackageById(s.getPackageId());
             String memberCode = m != null ? m.getMemberCode() : "";
-            String name = m != null ? m.getFullName() : "";
+            String name = m != null ? memberService.resolveDisplayName(m) : "";
             String pkg = p != null ? p.getPackageName() : "";
             String time = c.getCheckInTime() != null
                     ? c.getCheckInTime().toLocalDateTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))
@@ -394,7 +394,9 @@ public class StaffCheckinPanel extends JPanel {
         String expiry = sub != null && sub.getEndDate() != null ? sub.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
         boolean allowed = subscriptionService.isValidForCheckIn(sub);
 
-        renderMemberFound(member.getMemberCode(), member.getFullName(), member.getPhone(), pkgName, expiry, allowed);
+        String displayName = memberService.resolveDisplayName(member);
+        String phone = memberService.resolvePhone(member);
+        renderMemberFound(member.getMemberCode(), displayName, phone, pkgName, expiry, allowed);
     }
 
     private void renderNotFound() {

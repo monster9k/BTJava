@@ -28,9 +28,13 @@ public class AuthService {
     }
 
     // Xử lý Đăng ký tài khoản
-    public boolean register(String username, String rawPassword, String fullName, int roleId) {
+    public boolean register(String username, String rawPassword, String fullName, String phone, int roleId) {
         if (username.isEmpty() || rawPassword.isEmpty() || fullName.isEmpty()) {
             System.out.println("✗ Register: Empty input");
+            return false;
+        }
+
+        if (userDAO.findByUsername(username) != null) {
             return false;
         }
 
@@ -42,13 +46,29 @@ public class AuthService {
         newUser.setUsername(username);
         newUser.setPassword(hashedPassword);
         newUser.setFullname(fullName);
+        newUser.setPhone(phone != null && !phone.trim().isEmpty() ? phone.trim() : null);
         newUser.setRoleId(roleId);
         newUser.setStatus(true);
 
         System.out.println("Register: About to insert user...");
         int result = userDAO.insert(newUser);
         System.out.println("Register: Insert result=" + result);
-        return result > 0;
+        if (result <= 0) {
+            return false;
+        }
+
+        if (roleId == com.gym.util.AppConstants.ROLE_MEMBER) {
+            User created = userDAO.findByUsername(username);
+            if (created == null) {
+                return false;
+            }
+            com.gym.service.MemberService memberService = new com.gym.service.MemberService();
+            if (!memberService.addMemberForUser(created.getId(), fullName, phone)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Kiểm tra username đã tồn tại trong database

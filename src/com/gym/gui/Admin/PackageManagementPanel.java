@@ -20,6 +20,8 @@ import static com.gym.gui.AppStyle.*;
 public class PackageManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
+    private JTable table;
+    private java.util.List<GymPackage> cachedPackages;
     private final JFrame owner;
     private PackageService packageService;
     private NumberFormat currencyFormat;
@@ -42,7 +44,7 @@ public class PackageManagementPanel extends JPanel {
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
         JButton btnAdd = makeActionButton("➕ Thêm gói tập", ACCENT_GREEN);
-        btnAdd.addActionListener(e -> new AddPackageDialog(owner).setVisible(true));
+        btnAdd.addActionListener(e -> new AddPackageDialog(owner, this::loadPackagesFromDB).setVisible(true));
         toolBar.add(title,  BorderLayout.WEST);
         toolBar.add(btnAdd, BorderLayout.EAST);
         add(toolBar, BorderLayout.NORTH);
@@ -53,8 +55,18 @@ public class PackageManagementPanel extends JPanel {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
-        JTable table = new JTable(tableModel);
+        table = new JTable(tableModel);
         styleTableAppearance(table);
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (row >= 0 && col == 6) {
+                    showActionMenu(row, e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
         add(makeScrollPane(table), BorderLayout.CENTER);
     }
 
@@ -64,9 +76,9 @@ public class PackageManagementPanel extends JPanel {
     private void loadPackagesFromDB() {
         try {
             clearData();
-            java.util.List<GymPackage> packages = packageService.getAllPackages();
+            cachedPackages = packageService.getAllPackages();
 
-            for (GymPackage pkg : packages) {
+            for (GymPackage pkg : cachedPackages) {
                 String status = pkg.isStatus() ? "✅ Active" : "🔴 Ẩn";
                 String price = currencyFormat.format(pkg.getPrice().doubleValue());
 
@@ -92,4 +104,19 @@ public class PackageManagementPanel extends JPanel {
 
     public void clearData() { tableModel.setRowCount(0); }
     public void addRow(Object[] rowData) { tableModel.addRow(rowData); }
+
+    private void showActionMenu(int row, Component invoker, int x, int y) {
+        if (cachedPackages == null || row >= cachedPackages.size()) {
+            return;
+        }
+        GymPackage selected = cachedPackages.get(row);
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem edit = new JMenuItem("Sửa gói tập");
+        edit.addActionListener(e -> {
+            new EditPackageDialog(owner, selected).setVisible(true);
+            loadPackagesFromDB();
+        });
+        menu.add(edit);
+        menu.show(invoker, x, y);
+    }
 }

@@ -21,4 +21,12 @@ public class UserSession {
     public static boolean isAdmin() {
         return currentUser != null && currentUser.getRoleId() == AppConstants.ROLE_ADMIN;
     }
+
+    public static boolean isStaff() {
+        return currentUser != null && currentUser.getRoleId() == AppConstants.ROLE_STAFF;
+    }
+
+    public static boolean isMember() {
+        return currentUser != null && currentUser.getRoleId() == AppConstants.ROLE_MEMBER;
+    }
 }

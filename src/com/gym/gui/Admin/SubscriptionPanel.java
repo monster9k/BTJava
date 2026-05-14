@@ -26,6 +26,8 @@ import static com.gym.gui.AppStyle.*;
 public class SubscriptionPanel extends JPanel {
 
     private DefaultTableModel tableModel;
+    private JTable table;
+    private java.util.List<Subscription> cachedSubscriptions;
     private final JFrame owner;
     private final SubscriptionService subscriptionService = new SubscriptionService();
     private final MemberService memberService = new MemberService();
@@ -57,14 +59,24 @@ public class SubscriptionPanel extends JPanel {
         add(toolBar, BorderLayout.NORTH);
 
         // --- Table ---
-        String[] cols = {"ID","Mã HV","Hội viên","Gói tập","Ngày bắt đầu","Ngày hết hạn","Giá mua (VNĐ)","TT Gói","TT Thanh toán","Ngày tạo"};
+        String[] cols = {"ID","Mã HV","Hội viên","Gói tập","Ngày bắt đầu","Ngày hết hạn","Giá mua (VNĐ)","TT Gói","TT Thanh toán","Ngày tạo","Thao tác"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
         loadSubscriptions();
 
-        JTable table = new JTable(tableModel);
+        table = new JTable(tableModel);
         styleTableAppearance(table);
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (row >= 0 && col == 10) {
+                    showActionMenu(row, e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
         add(makeScrollPane(table), BorderLayout.CENTER);
     }
 
@@ -73,18 +85,29 @@ public class SubscriptionPanel extends JPanel {
 
     private void loadSubscriptions() {
         clearData();
-        for (Subscription s : subscriptionService.getAllSubscriptions()) {
+        cachedSubscriptions = subscriptionService.getAllSubscriptions();
+        for (Subscription s : cachedSubscriptions) {
             Member m = memberService.getMemberById(s.getMemberId());
             GymPackage p = packageService.getPackageById(s.getPackageId());
 
             String memberCode = m != null ? m.getMemberCode() : "";
-            String memberName = m != null ? m.getFullName() : "";
+            String memberName = m != null ? memberService.resolveDisplayName(m) : "";
             String packageName = p != null ? p.getPackageName() : "";
             String start = s.getStartDate() != null ? s.getStartDate().format(dateFmt) : "";
             String end = s.getEndDate() != null ? s.getEndDate().format(dateFmt) : "";
             String price = currencyFormat.format(s.getPriceAtPurchase()) + "";
+            String created = s.getCreatedAt() != null ? s.getCreatedAt().toLocalDate().format(dateFmt) : start;
 
-            String status = s.getStatus() == AppConstants.SUBSCRIPTION_ACTIVE ? "✅ Active" : (s.getStatus() == AppConstants.SUBSCRIPTION_EXPIRED ? "🔴 Hết hạn" : "❌ Hủy");
+            String status;
+            if (s.getStatus() == AppConstants.SUBSCRIPTION_PENDING) {
+                status = "⏳ Pending";
+            } else if (s.getStatus() == AppConstants.SUBSCRIPTION_ACTIVE) {
+                status = "✅ Active";
+            } else if (s.getStatus() == AppConstants.SUBSCRIPTION_EXPIRED) {
+                status = "🔴 Hết hạn";
+            } else {
+                status = "❌ Hủy";
+            }
             String payment = s.getPaymentStatus() == AppConstants.PAYMENT_PAID ? "✅ Đã TT" : "⏳ Chưa TT";
 
             addRow(new Object[]{
@@ -97,8 +120,43 @@ public class SubscriptionPanel extends JPanel {
                     price,
                     status,
                     payment,
-                    start
+                    created,
+                    "Sửa | Xóa"
             });
         }
+    }
+
+    private void showActionMenu(int row, Component invoker, int x, int y) {
+        if (cachedSubscriptions == null || row >= cachedSubscriptions.size()) {
+            return;
+        }
+        Subscription selected = cachedSubscriptions.get(row);
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem edit = new JMenuItem("Sửa trạng thái");
+        edit.addActionListener(e -> {
+            new EditSubscriptionDialog(owner, selected).setVisible(true);
+            loadSubscriptions();
+        });
+        JMenuItem cancel = new JMenuItem("Hủy gói (xóa)");
+        cancel.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Bạn có chắc muốn hủy gói này?",
+                    "Xác nhận",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+            boolean ok = subscriptionService.cancelSubscription(selected.getId());
+            if (!ok) {
+                JOptionPane.showMessageDialog(this, "Hủy gói thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+            loadSubscriptions();
+        });
+        menu.add(edit);
+        menu.add(cancel);
+        menu.show(invoker, x, y);
     }
 }

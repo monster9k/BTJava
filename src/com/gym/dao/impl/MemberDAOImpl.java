@@ -12,6 +12,7 @@ public class MemberDAOImpl extends BaseDAO implements IMemberDAO {
     private Member mapMember(java.sql.ResultSet rs) throws java.sql.SQLException {
         Member m = new Member();
         m.setId(rs.getInt("id"));
+        m.setUserId((Integer) rs.getObject("user_id"));
         m.setMemberCode(rs.getString("member_code"));
         m.setFullName(rs.getString("full_name"));
         m.setPhone(rs.getString("phone"));
@@ -49,6 +50,13 @@ public class MemberDAOImpl extends BaseDAO implements IMemberDAO {
     }
 
     @Override
+    public Member findByUserId(int userId) {
+        String sql = "SELECT * FROM members WHERE user_id = ?";
+        List<Member> list = executeQuery(sql, this::mapMember, userId);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    @Override
     public List<Member> searchByNameOrPhone(String keyword) {
         String searchTerm = "%" + keyword + "%";
         String sql = "SELECT * FROM members WHERE (full_name LIKE ? OR phone LIKE ?) AND status = true ORDER BY full_name";
@@ -57,8 +65,9 @@ public class MemberDAOImpl extends BaseDAO implements IMemberDAO {
 
     @Override
     public int insert(Member member) {
-        String sql = "INSERT INTO members (member_code, full_name, phone, gender, birthday, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO members (user_id, member_code, full_name, phone, gender, birthday, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         return executeUpdate(sql,
+                member.getUserId(),
                 member.getMemberCode(),
                 member.getFullName(),
                 member.getPhone(),
@@ -74,7 +83,7 @@ public class MemberDAOImpl extends BaseDAO implements IMemberDAO {
                 member.getFullName(),
                 member.getPhone(),
                 member.getGender(),
-                java.sql.Date.valueOf(member.getBirthday()),
+                member.getBirthday() != null ? java.sql.Date.valueOf(member.getBirthday()) : null,
                 member.getId());
     }
 
@@ -84,4 +93,3 @@ public class MemberDAOImpl extends BaseDAO implements IMemberDAO {
         return executeUpdate(sql, id);
     }
 }
-

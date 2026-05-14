@@ -16,9 +16,15 @@ import static com.gym.gui.AppStyle.*;
  */
 public class AddPackageDialog extends JDialog {
     private final PackageService packageService = new PackageService();
+    private final Runnable onSaved;
 
     public AddPackageDialog(JFrame parent) {
+        this(parent, null);
+    }
+
+    public AddPackageDialog(JFrame parent, Runnable onSaved) {
         super(parent, "➕ Thêm Gói Tập Mới", true);
+        this.onSaved = onSaved;
         pack();
         setMinimumSize(new Dimension(500, 650));
         setLocationRelativeTo(parent);
@@ -81,6 +87,9 @@ public class AddPackageDialog extends JDialog {
             }
 
             JOptionPane.showMessageDialog(this, "Thêm gói tập mới thành công!");
+            if (onSaved != null) {
+                onSaved.run();
+            }
             dispose();
         });
 
