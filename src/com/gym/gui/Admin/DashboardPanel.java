@@ -24,18 +24,18 @@ import java.util.Locale;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * DashboardPanel.java
- * Màn hình tổng quan: 4 stat card + bảng sắp hết hạn + check-in hôm nay.
- *
- * Cách dùng từ AdminDashboard:
- *   showPanel(new DashboardPanel());
- *   // showPanel() nội bộ gọi contentPanel.add(panel, BorderLayout.CENTER)
- *
- * Cách update dữ liệu từ backend:
- *   dash.clearExpiringMembers();
- *   dash.addExpiringMember("MEM001", "Nguyễn Văn A", "0901...", "10/05/2026");
- */
+
+
+
+
+
+
+
+
+
+
+
+
 public class DashboardPanel extends JPanel {
 
     private DefaultTableModel expiringMembersModel;
@@ -56,7 +56,7 @@ public class DashboardPanel extends JPanel {
     }
 
     private void build() {
-        // --- Row 1: 4 Stat Cards ---
+        
         JPanel statsRow = new JPanel(new GridLayout(1, 4, 16, 0));
         statsRow.setBackground(BG_DARK);
         statsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
@@ -73,7 +73,7 @@ public class DashboardPanel extends JPanel {
         add(statsRow);
         add(Box.createVerticalStrut(20));
 
-        // --- Row 2: Bảng sắp hết hạn + Check-in ---
+        
         JPanel row2 = new JPanel(new GridLayout(1, 2, 16, 0));
         row2.setBackground(BG_DARK);
         row2.add(buildExpiringMembersTable());
@@ -81,7 +81,7 @@ public class DashboardPanel extends JPanel {
         add(row2);
     }
 
-    // ==================== STAT CARD ====================
+    
 
     private JPanel makeStatCard(String label, String value, String sub, Color accent, String emoji) {
         JPanel card = new JPanel(new BorderLayout());
@@ -110,7 +110,7 @@ public class DashboardPanel extends JPanel {
         return card;
     }
 
-    // ==================== EXPIRING MEMBERS TABLE ====================
+    
 
     private JPanel buildExpiringMembersTable() {
         JPanel panel = new JPanel(new BorderLayout(0, 10));
@@ -141,17 +141,17 @@ public class DashboardPanel extends JPanel {
         return panel;
     }
 
-    /** Thêm hàng vào bảng sắp hết hạn. Gọi từ backend sau clearExpiringMembers(). */
+    
     public void addExpiringMember(String memberId, String name, String phone, String expiryDate) {
         expiringMembersModel.addRow(new Object[]{memberId, name, phone, expiryDate});
     }
 
-    /** Xóa toàn bộ dữ liệu bảng sắp hết hạn để load lại. */
+    
     public void clearExpiringMembers() {
         expiringMembersModel.setRowCount(0);
     }
 
-    // ==================== TODAY CHECK-IN TABLE ====================
+    
 
     private JPanel buildTodayCheckinPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 10));
@@ -182,12 +182,12 @@ public class DashboardPanel extends JPanel {
         return panel;
     }
 
-    /** Thêm hàng vào bảng check-in hôm nay. */
+    
     public void addTodayCheckin(String memberId, String name, String packageName, String checkInTime) {
         todayCheckinModel.addRow(new Object[]{memberId, name, packageName, checkInTime});
     }
 
-    /** Xóa toàn bộ dữ liệu bảng check-in để load lại. */
+    
     public void clearTodayCheckin() {
         todayCheckinModel.setRowCount(0);
     }

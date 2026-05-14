@@ -9,9 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Business logic cho Member
- */
+
+
+
 public class MemberService {
     private IMemberDAO memberDAO;
 
@@ -19,16 +19,16 @@ public class MemberService {
         this.memberDAO = new MemberDAOImpl();
     }
 
-    /**
-     * Lấy tất cả thành viên (kể cả inactive)
-     */
+    
+
+
     public List<Member> getAllMembers() {
         return memberDAO.findAll();
     }
 
-    /**
-     * Lấy thành viên theo ID
-     */
+    
+
+
     public Member getMemberById(int id) {
         return memberDAO.findById(id);
     }
@@ -40,16 +40,16 @@ public class MemberService {
         return memberDAO.findByUserId(userId);
     }
 
-    /**
-     * Lấy thành viên theo mã hội viên
-     */
+    
+
+
     public Member getMemberByCode(String code) {
         return memberDAO.findByCode(code);
     }
 
-    /**
-     * Tìm thành viên theo tên hoặc SĐT
-     */
+    
+
+
     public List<Member> searchMembers(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllMembers();
@@ -57,11 +57,11 @@ public class MemberService {
         return memberDAO.searchByNameOrPhone(keyword);
     }
 
-    /**
-     * Thêm thành viên mới
-     * - Tự động sinh mã hội viên
-     * - Set status = active
-     */
+    
+
+
+
+
     public boolean addMember(String fullName, String phone, String gender, LocalDate birthday) {
         if (fullName == null || fullName.trim().isEmpty()) {
             System.out.println("Tên hội viên không được rỗng");
@@ -121,9 +121,9 @@ public class MemberService {
         return memberDAO.insert(member) > 0;
     }
 
-    /**
-     * Cập nhật thông tin thành viên
-     */
+    
+
+
     public boolean updateMember(int id, String fullName, String phone, String gender, LocalDate birthday) {
         if (fullName == null || fullName.trim().isEmpty()) {
             System.out.println("Tên hội viên không được rỗng");
@@ -145,9 +145,9 @@ public class MemberService {
         return result > 0;
     }
 
-    /**
-     * Cập nhật trạng thái hoạt động cho hội viên
-     */
+    
+
+
     public boolean updateMemberStatus(int id, boolean status) {
         Member member = memberDAO.findById(id);
         if (member == null) {
@@ -158,9 +158,9 @@ public class MemberService {
         return result > 0;
     }
 
-    /**
-     * Xóa tạm thời (soft delete) - set status = inactive
-     */
+    
+
+
     public boolean deactivateMember(int id) {
         Member member = memberDAO.findById(id);
         if (member == null) {
@@ -172,13 +172,13 @@ public class MemberService {
         return result > 0;
     }
 
-    /**
-     * Sinh mã hội viên định dạng: GYM + năm + 3-5 số thứ tự
-     * Ví dụ: GYM26001, GYM26002, ...
-     */
+    
+
+
+
     private String generateMemberCode() {
         LocalDate today = LocalDate.now();
-        int year = today.getYear() % 100; // Lấy 2 chữ số cuối năm
+        int year = today.getYear() % 100; 
         List<Member> allMembers = memberDAO.findAll();
         int maxSeq = 0;
         for (Member m : allMembers) {
@@ -186,7 +186,7 @@ public class MemberService {
             if (code != null && code.startsWith(AppConstants.MEMBER_CODE_PREFIX)) {
                 String digits = code.replace(AppConstants.MEMBER_CODE_PREFIX, "");
                 if (digits.length() >= 2) {
-                    String seqPart = digits.substring(2); // bỏ 2 số năm
+                    String seqPart = digits.substring(2); 
                     try {
                         int seq = Integer.parseInt(seqPart);
                         if (seq > maxSeq) {
@@ -201,16 +201,16 @@ public class MemberService {
         return String.format("%s%02d%04d", AppConstants.MEMBER_CODE_PREFIX, year, nextSeq);
     }
 
-    /**
-     * Lấy mã hội viên kế tiếp để hiển thị trước
-     */
+    
+
+
     public String getNextMemberCode() {
         return generateMemberCode();
     }
 
-    /**
-     * Tìm member theo mã hoặc SĐT
-     */
+    
+
+
     public Member findByCodeOrPhone(String query) {
         if (query == null || query.trim().isEmpty()) {
             return null;
@@ -224,7 +224,7 @@ public class MemberService {
         if (list.isEmpty()) {
             return null;
         }
-        // Ưu tiên match phone chính xác
+        
         for (Member m : list) {
             if (m.getPhone() != null && m.getPhone().equals(q)) {
                 return m;
@@ -233,9 +233,9 @@ public class MemberService {
         return list.get(0);
     }
 
-    /**
-     * Kiểm tra thành viên có tồn tại và đang active không
-     */
+    
+
+
     public boolean isActiveMember(int memberId) {
         Member member = memberDAO.findById(memberId);
         return member != null && member.isStatus();

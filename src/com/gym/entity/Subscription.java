@@ -10,9 +10,9 @@ public class Subscription {
     private int packageId;
     private java.time.LocalDate startDate;
     private java.time.LocalDate endDate;
-    private java.math.BigDecimal priceAtPurchase; // Giá snapshot lúc bán
-    private int status; // 1: Active, 2: Expired, 3: Canceled
-    private int paymentStatus; // 1: Paid, 0: Unpaid
+    private java.math.BigDecimal priceAtPurchase; 
+    private int status; 
+    private int paymentStatus; 
     private java.time.LocalDateTime createdAt;
 
     public int getId() {

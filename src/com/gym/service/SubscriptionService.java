@@ -9,13 +9,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Business logic cho Subscription (đăng ký gói, gia hạn)
- * Quy tắc:
- * - Đăng ký mới: tạo dòng subscription mới
- * - Gia hạn: cũng tạo dòng mới (không overwrite cũ)
- * - Giữ lịch sử để audit
- */
+
+
+
+
+
+
+
 public class SubscriptionService {
     private ISubscriptionDAO subscriptionDAO;
     private PackageService packageService;
@@ -25,9 +25,9 @@ public class SubscriptionService {
         this.packageService = new PackageService();
     }
 
-    /**
-     * Lấy tất cả gói đăng ký của thành viên
-     */
+    
+
+
     public List<Subscription> getSubscriptionsForMember(int memberId) {
         return subscriptionDAO.findByMemberId(memberId);
     }
@@ -40,9 +40,9 @@ public class SubscriptionService {
         return subscriptionDAO.findById(id);
     }
 
-    /**
-     * Lấy gói đang còn hạn của thành viên (status = ACTIVE)
-     */
+    
+
+
     public Subscription getActiveSubscription(int memberId) {
         return subscriptionDAO.findActiveSubscription(memberId);
     }
@@ -60,15 +60,15 @@ public class SubscriptionService {
         return subscriptionDAO.findLatestByMemberId(memberId);
     }
 
-    /**
-     * Đăng ký gói mới cho thành viên
-     * Rule:
-     * - start_date = hôm nay
-     * - end_date = start_date + duration_days
-     * - price_at_purchase = giá tại thời điểm đăng ký (snapshot)
-     * - status = ACTIVE
-     * - payment_status = UNPAID (mặc định)
-     */
+    
+
+
+
+
+
+
+
+
     public boolean registerPackage(int memberId, int packageId) {
         return registerPackageInternal(memberId, packageId, AppConstants.SUBSCRIPTION_ACTIVE, AppConstants.PAYMENT_UNPAID);
     }
@@ -82,19 +82,19 @@ public class SubscriptionService {
     }
 
     private boolean registerPackageInternal(int memberId, int packageId, int status, int paymentStatus) {
-        // Validate
+        
         if (packageId <= 0 || memberId <= 0) {
             System.out.println("ID không hợp lệ");
             return false;
         }
 
-        // Kiểm tra gói có tồn tại không
+        
         if (!packageService.isActivePackage(packageId)) {
             System.out.println("Gói tập không tồn tại hoặc không active");
             return false;
         }
 
-        // Tạo subscription
+        
         Subscription sub = new Subscription();
         sub.setMemberId(memberId);
         sub.setPackageId(packageId);
@@ -113,20 +113,20 @@ public class SubscriptionService {
         return result > 0;
     }
 
-    /**
-     * Gia hạn gói cho thành viên
-     * - Tạo subscription mới, không overwrite cũ
-     * - Tính end_date từ ngày gia hạn + duration mới
-     */
+    
+
+
+
+
     public boolean renewPackage(int memberId, int packageId) {
         return renewPackageWithPayment(memberId, packageId, AppConstants.PAYMENT_UNPAID);
     }
 
-    /**
-     * Gia hạn gói với trạng thái thanh toán
-     */
+    
+
+
     public boolean renewPackageWithPayment(int memberId, int packageId, int paymentStatus) {
-        // Validate
+        
         if (packageId <= 0 || memberId <= 0) {
             System.out.println("ID không hợp lệ");
             return false;
@@ -137,12 +137,12 @@ public class SubscriptionService {
             return false;
         }
 
-        // Lấy gói cũ để check
+        
         Subscription oldSub = subscriptionDAO.findActiveSubscription(memberId);
         LocalDate startDate;
         
-        // Nếu gói cũ còn hạn, gia hạn từ ngày hết hạn
-        // Nếu gói cũ đã hết, gia hạn từ hôm nay
+        
+        
         if (oldSub != null && oldSub.getEndDate().isAfter(LocalDate.now())) {
             startDate = oldSub.getEndDate();
         } else {
@@ -165,9 +165,9 @@ public class SubscriptionService {
         return result > 0;
     }
 
-    /**
-     * Cập nhật trạng thái thanh toán
-     */
+    
+
+
     public boolean updatePaymentStatus(int subscriptionId, int paymentStatus) {
         int result = subscriptionDAO.updatePaymentStatus(subscriptionId, paymentStatus);
         return result > 0;
@@ -178,28 +178,28 @@ public class SubscriptionService {
         return result > 0;
     }
 
-    /**
-     * Đánh dấu subscription là PAID
-     */
+    
+
+
     public boolean markAsPaid(int subscriptionId) {
         return updatePaymentStatus(subscriptionId, AppConstants.PAYMENT_PAID);
     }
 
-    /**
-     * Hủy gói đăng ký
-     */
+    
+
+
     public boolean cancelSubscription(int subscriptionId) {
         int result = subscriptionDAO.cancelSubscription(subscriptionId);
         return result > 0;
     }
 
-    /**
-     * Kiểm tra xem subscription có hợp lệ để check-in không
-     * Điều kiện:
-     * 1. subscription đang ACTIVE
-     * 2. đã PAID
-     * 3. ngày hiện tại nằm giữa start_date và end_date
-     */
+    
+
+
+
+
+
+
     public boolean isValidForCheckIn(Subscription sub) {
         if (sub == null) {
             return false;
@@ -212,16 +212,16 @@ public class SubscriptionService {
                 && !today.isAfter(sub.getEndDate());
     }
 
-    /**
-     * Lấy danh sách gói sắp hết hạn trong N ngày tới
-     */
+    
+
+
     public List<Subscription> getExpiringSubscriptions(int days) {
         return subscriptionDAO.findExpiringSoon(days);
     }
 
-    /**
-     * Lấy danh sách gói sắp hết hạn theo cấu hình mặc định
-     */
+    
+
+
     public List<Subscription> getExpiringSubscriptionsDefault() {
         return getExpiringSubscriptions(AppConstants.REPORT_EXPIRING_DAYS);
     }

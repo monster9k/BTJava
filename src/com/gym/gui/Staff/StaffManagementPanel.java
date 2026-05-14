@@ -11,14 +11,14 @@ import com.gym.util.AppConstants;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * StaffManagementPanel.java
- * Panel quản lý nhân viên. Hiển thị bảng danh sách + nút Thêm nhân viên.
- *
- * Cách update dữ liệu:
- *   panel.clearData();
- *   panel.addRow(new Object[]{"U006","staff05","Lê Thị F","STAFF","Active","Sửa | Khóa"});
- */
+
+
+
+
+
+
+
+
 public class StaffManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
@@ -35,7 +35,7 @@ public class StaffManagementPanel extends JPanel {
     }
 
     private void build() {
-        // --- Toolbar ---
+        
         JPanel toolBar = new JPanel(new BorderLayout());
         toolBar.setBackground(BG_DARK);
         JLabel title = new JLabel("Quản lý Nhân viên");
@@ -50,7 +50,7 @@ public class StaffManagementPanel extends JPanel {
         toolBar.add(btnAdd, BorderLayout.EAST);
         add(toolBar, BorderLayout.NORTH);
 
-        // --- Table ---
+        
         String[] cols = {"ID", "Tên đăng nhập", "Họ tên", "SĐT", "Vai trò", "Trạng thái", "Thao tác"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
@@ -73,10 +73,10 @@ public class StaffManagementPanel extends JPanel {
         add(makeScrollPane(table), BorderLayout.CENTER);
     }
 
-    /** Xóa toàn bộ dữ liệu bảng. Gọi trước khi load dữ liệu mới. */
+    
     public void clearData() { tableModel.setRowCount(0); }
 
-    /** Thêm một hàng nhân viên vào bảng. */
+    
     public void addRow(Object[] rowData) { tableModel.addRow(rowData); }
 
     private void loadStaff() {

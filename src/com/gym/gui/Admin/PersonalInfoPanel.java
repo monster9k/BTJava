@@ -13,11 +13,11 @@ import java.awt.*;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * PersonalInfoPanel.java
- * Panel hiển thị & chỉnh sửa thông tin cá nhân của admin.
- * Hiện gồm: tên hiển thị và đổi mật khẩu (UI demo).
- */
+
+
+
+
+
 public class PersonalInfoPanel extends JPanel {
 
     private final JFrame owner;
@@ -34,7 +34,7 @@ public class PersonalInfoPanel extends JPanel {
     }
 
     private void build() {
-        // Header
+        
         JLabel title = new JLabel(" Thông tin cá nhân");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
@@ -53,7 +53,7 @@ public class PersonalInfoPanel extends JPanel {
         gbc.gridy = 0;
         gbc.weightx = 1.0;
 
-        // Card hiển thị thông tin
+        
         JPanel card = new JPanel(new GridBagLayout());
         card.setBackground(CARD_BG);
         card.setBorder(new CompoundBorder(
@@ -69,7 +69,7 @@ public class PersonalInfoPanel extends JPanel {
         c.gridx = 0;
         c.gridy = 0;
 
-        // Tên hiển thị
+        
         c.gridy = 0;
         card.add(styledLabel("Tên hiển thị:"), c);
         c.gridy = 1;
@@ -77,7 +77,7 @@ public class PersonalInfoPanel extends JPanel {
         tfName.setEditable(true);
         card.add(tfName, c);
 
-        // Mật khẩu
+        
         c.gridy = 2;
         card.add(styledLabel("Mật khẩu (đổi):"), c);
         c.gridy = 3;

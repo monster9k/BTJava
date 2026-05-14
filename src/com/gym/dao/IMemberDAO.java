@@ -5,12 +5,12 @@ import java.util.List;
 public interface IMemberDAO {
     List<Member> findAll();
     Member findById(int id);
-    Member findByCode(String code); // Tìm kiếm nhanh khi check-in
+    Member findByCode(String code); 
     Member findByUserId(int userId);
     List<Member> searchByNameOrPhone(String keyword);
 
     int insert(Member member);
     int update(Member member);
-    int deleteSoft(int id); // Update status = false
+    int deleteSoft(int id); 
     int updateStatus(int id, boolean status);
 }

@@ -19,10 +19,10 @@ import com.gym.util.AppConstants;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * SubscriptionPanel.java
- * Panel đăng ký / gia hạn gói tập. Bảng danh sách subscription + nút đăng ký mới.
- */
+
+
+
+
 public class SubscriptionPanel extends JPanel {
 
     private DefaultTableModel tableModel;
@@ -43,7 +43,7 @@ public class SubscriptionPanel extends JPanel {
     }
 
     private void build() {
-        // --- Toolbar ---
+        
         JPanel toolBar = new JPanel(new BorderLayout());
         toolBar.setBackground(BG_DARK);
         JLabel title = new JLabel("Đăng ký / Gia hạn Gói tập");
@@ -58,7 +58,7 @@ public class SubscriptionPanel extends JPanel {
         toolBar.add(btnAdd, BorderLayout.EAST);
         add(toolBar, BorderLayout.NORTH);
 
-        // --- Table ---
+        
         String[] cols = {"ID","Mã HV","Hội viên","Gói tập","Ngày bắt đầu","Ngày hết hạn","Giá mua (VNĐ)","TT Gói","TT Thanh toán","Ngày tạo","Thao tác"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }

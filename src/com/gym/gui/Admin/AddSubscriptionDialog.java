@@ -21,11 +21,11 @@ import java.util.Locale;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * AddSubscriptionDialog.java
- * Dialog đăng ký gói tập mới cho hội viên.
- * Mở bằng: new AddSubscriptionDialog(parentFrame).setVisible(true);
- */
+
+
+
+
+
 public class AddSubscriptionDialog extends JDialog {
 
     public AddSubscriptionDialog(JFrame parent) {
@@ -96,7 +96,7 @@ public class AddSubscriptionDialog extends JDialog {
         gbc.gridy = row++; add(styledLabel("Trạng thái thanh toán (payment_status):"), gbc);
         gbc.gridy = row++; add(cbPayment, gbc);
 
-        // Thông tin tự động điền
+        
         JPanel autoFillNote = new JPanel(new GridLayout(0, 1, 0, 4));
         autoFillNote.setBackground(CARD_BG);
         autoFillNote.setBorder(new CompoundBorder(new RoundedBorder(DIVIDER, 1, 8), new EmptyBorder(10, 14, 10, 14)));

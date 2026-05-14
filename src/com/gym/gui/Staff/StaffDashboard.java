@@ -15,9 +15,9 @@ import java.time.format.DateTimeFormatter;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * StaffDashboard.java — Main Frame dành cho role STAFF
- */
+
+
+
 public class StaffDashboard extends JFrame {
 
     static final Color STAFF_ACCENT = UIManager.getColor("Label.foreground") != null
@@ -42,9 +42,9 @@ public class StaffDashboard extends JFrame {
 
     public StaffDashboard(String username) { this(username, username); }
 
-    // ===================================================================
-    //  INIT FRAME
-    // ===================================================================
+    
+    
+    
     private void initUI() {
         setTitle("GymPro — Staff Portal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,19 +59,19 @@ public class StaffDashboard extends JFrame {
 
         showCheckin();
 
-        // Start clock CHỈ sau khi frame hoàn toàn built & visible
+        
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
                 startClock();
-                removeWindowListener(this); // chỉ cần 1 lần
+                removeWindowListener(this); 
             }
         });
     }
 
-    // ===================================================================
-    //  SIDEBAR
-    // ===================================================================
+    
+    
+    
     private JPanel buildSidebar() {
         JPanel sb = new JPanel();
         sb.setBackground(SIDEBAR_BG);
@@ -230,9 +230,9 @@ public class StaffDashboard extends JFrame {
         return s;
     }
 
-    // ===================================================================
-    //  MAIN AREA
-    // ===================================================================
+    
+    
+    
     private JPanel buildMainArea() {
         JPanel main = new JPanel(new BorderLayout());
         main.setBackground(BG_DARK);
@@ -251,15 +251,15 @@ public class StaffDashboard extends JFrame {
     bar.setPreferredSize(new Dimension(0, 50));
     bar.setBorder(new MatteBorder(0, 0, 1, 0, DIVIDER));
 
-    // Fix: Tăng chiều rộng hoặc để nó tự co giãn hợp lý
+    
     JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 12)); 
     right.setOpaque(false);
 
-    // Đảm bảo clockLabel có đủ không gian hiển thị
+    
     clockLabel = new JLabel(); 
     clockLabel.setFont(FONT_SMALL);
     clockLabel.setForeground(TEXT_GRAY);
-    // Cập nhật text ngay lập tức để lấy PreferredSize
+    
     updateClockText();
 
         JLabel badge = new JLabel("STAFF");
@@ -270,12 +270,12 @@ public class StaffDashboard extends JFrame {
             new EmptyBorder(2, 8, 2, 8)
         ));
 
-        // // clockLabel: tạo text ngay để có preferred size đúng từ đầu
-        // String initTime = LocalDateTime.now()
-        //     .format(DateTimeFormatter.ofPattern("HH:mm:ss  |  dd/MM/yyyy"));
-        // clockLabel = new JLabel(initTime);
-        // clockLabel.setFont(FONT_SMALL);
-        // clockLabel.setForeground(TEXT_GRAY);
+        
+        
+        
+        
+        
+        
 
         right.add(clockLabel);
         right.add(badge);
@@ -286,9 +286,9 @@ public class StaffDashboard extends JFrame {
     private void updateClockText() {
     clockLabel.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss  |  dd/MM/yyyy")));
 }
-    // ===================================================================
-    //  NAVIGATION
-    // ===================================================================
+    
+    
+    
     void showPanel(JPanel panel) {
         contentPanel.removeAll();
         contentPanel.add(panel, BorderLayout.CENTER);
@@ -300,18 +300,18 @@ public class StaffDashboard extends JFrame {
         showPanel(new StaffCheckinPanel(this));
     }
 
-    // ===================================================================
-    //  ĐỒNG HỒ — gọi qua windowOpened, đảm bảo frame đã visible hoàn toàn
-    // ===================================================================
+    
+    
+    
     private void startClock() {
         new Timer(1000, e -> clockLabel.setText(
             LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss  |  dd/MM/yyyy"))
         )).start();
     }
 
-    // ===================================================================
-    //  ĐĂNG XUẤT
-    // ===================================================================
+    
+    
+    
     private void confirmLogout() {
         int r = JOptionPane.showConfirmDialog(
             this, "Bạn muốn đăng xuất?", "Xác nhận",

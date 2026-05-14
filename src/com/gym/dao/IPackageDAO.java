@@ -4,8 +4,8 @@ import com.gym.entity.GymPackage;
 import java.util.List;
 
 public interface IPackageDAO {
-    List<GymPackage> findAllActive(); // Chỉ lấy gói đang kinh doanh (status=true)
-    List<GymPackage> findAll();       // Lấy hết (kể cả gói đã ngừng bán)
+    List<GymPackage> findAllActive(); 
+    List<GymPackage> findAll();       
     GymPackage findById(int id);
 
     int insert(GymPackage pkg);

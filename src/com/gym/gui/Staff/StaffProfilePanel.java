@@ -9,14 +9,14 @@ import com.gym.service.UserService;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * StaffProfilePanel.java
- * Panel thông tin cá nhân của Staff.
- *
- * Gồm 2 section:
- *   [1] Thông tin cơ bản  — tên hiển thị, SĐT
- *   [2] Bảo mật           — đổi mật khẩu
- */
+
+
+
+
+
+
+
+
 public class StaffProfilePanel extends JPanel {
 
     private final String         username;
@@ -40,16 +40,16 @@ public class StaffProfilePanel extends JPanel {
         }
     }
 
-    // ===================================================================
+    
     private void build(String displayName) {
-        // Title
+        
         JLabel title = new JLabel("Thông tin cá nhân");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
         title.setBorder(new EmptyBorder(0, 0, 4, 0));
         add(title, BorderLayout.NORTH);
 
-        // Container 2 card xếp dọc
+        
         JPanel cards = new JPanel();
         cards.setBackground(BG_DARK);
         cards.setLayout(new BoxLayout(cards, BoxLayout.Y_AXIS));
@@ -65,14 +65,14 @@ public class StaffProfilePanel extends JPanel {
         add(scroll, BorderLayout.CENTER);
     }
 
-    // ===================================================================
-    //  CARD 1 — Thông tin cơ bản
-    // ===================================================================
+    
+    
+    
     private JPanel buildInfoCard(String displayName) {
-        // wrapper: BoxLayout Y_AXIS — section label trên, inner card dưới
+        
         JPanel wrapper = makeWrapper("Thông tin cơ bản");
 
-        // inner: GridBagLayout — nơi add các field
+        
         JPanel inner = new JPanel(new GridBagLayout());
         inner.setBackground(CARD_BG);
         inner.setBorder(new CompoundBorder(
@@ -82,7 +82,7 @@ public class StaffProfilePanel extends JPanel {
 
         GridBagConstraints gbc = defaultGbc();
 
-        // Username (chỉ đọc)
+        
         gbc.gridy = 0; inner.add(styledLabel("Tên đăng nhập:"), gbc);
         gbc.gridy = 1;
         JTextField tfUser = makeStyledTextField(username, 20);
@@ -90,19 +90,19 @@ public class StaffProfilePanel extends JPanel {
         tfUser.setForeground(TEXT_GRAY);
         inner.add(tfUser, gbc);
 
-        // Tên hiển thị
+        
         gbc.gridy = 2; inner.add(styledLabel("Tên hiển thị:"), gbc);
         gbc.gridy = 3;
         tfDisplayName = makeStyledTextField(displayName != null ? displayName : "", 20);
         inner.add(tfDisplayName, gbc);
 
-        // SĐT
+        
         gbc.gridy = 4; inner.add(styledLabel("Số điện thoại:"), gbc);
         gbc.gridy = 5;
         tfPhone = makeStyledTextField("Nhập số điện thoại...", 20);
         inner.add(tfPhone, gbc);
 
-        // Nút lưu
+        
         JButton btnSave = makeActionButton("Lưu thông tin", StaffDashboard.STAFF_ACCENT);
         btnSave.addActionListener(e -> saveInfo());
         gbc.gridy  = 6;
@@ -113,9 +113,9 @@ public class StaffProfilePanel extends JPanel {
         return wrapper;
     }
 
-    // ===================================================================
-    //  CARD 2 — Đổi mật khẩu
-    // ===================================================================
+    
+    
+    
     private JPanel buildPasswordCard() {
         JPanel wrapper = makeWrapper("Đổi mật khẩu");
 
@@ -163,16 +163,16 @@ public class StaffProfilePanel extends JPanel {
         return wrapper;
     }
 
-    // ===================================================================
-    //  HELPERS
-    // ===================================================================
+    
+    
+    
 
-    /**
-     * Tạo wrapper BoxLayout Y_AXIS:
-     *   - section label (teal) ở trên
-     *   - caller tự add inner card bên dưới qua wrapper.add(inner)
-     * Trả về wrapper để caller gọi wrapper.add(innerCard).
-     */
+    
+
+
+
+
+
     private JPanel makeWrapper(String sectionTitle) {
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
@@ -198,9 +198,9 @@ public class StaffProfilePanel extends JPanel {
         return g;
     }
 
-    // ===================================================================
-    //  SAVE ACTIONS
-    // ===================================================================
+    
+    
+    
     private void saveInfo() {
         String newName  = tfDisplayName.getText().trim();
         String newPhone = tfPhone.getText().trim();

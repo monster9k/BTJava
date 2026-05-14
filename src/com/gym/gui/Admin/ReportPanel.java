@@ -23,11 +23,11 @@ import java.util.Locale;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * ReportPanel.java
- * Panel báo cáo doanh thu. Hiển thị bộ lọc tháng, 3 stat card tóm tắt
- * và bảng chi tiết giao dịch.
- */
+
+
+
+
+
 public class ReportPanel extends JPanel {
 
     private DefaultTableModel tableModel;
@@ -48,7 +48,7 @@ public class ReportPanel extends JPanel {
     }
 
     private void build() {
-        // --- Header + bộ lọc tháng ---
+        
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
         header.setBackground(BG_DARK);
 
@@ -77,7 +77,7 @@ public class ReportPanel extends JPanel {
         header.add(btnLoc);
         add(header, BorderLayout.NORTH);
 
-        // --- Summary row (3 stat cards) ---
+        
         JPanel summaryRow = new JPanel(new GridLayout(1, 3, 16, 0));
         summaryRow.setBackground(BG_DARK);
         summaryRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
@@ -88,7 +88,7 @@ public class ReportPanel extends JPanel {
         summaryRow.add(makeStatCard("Số gói đã bán", packagesValue, "trong tháng", ACCENT_BLUE, ""));
         summaryRow.add(makeStatCard("Chưa thu tiền", unpaidValue, "cần theo dõi", ACCENT_RED, ""));
 
-        // --- Detail table ---
+        
         String[] cols = {"Ngày mua", "Mã HV", "Hội viên", "Gói tập", "Giá (VNĐ)", "TT Thanh toán"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
@@ -132,10 +132,10 @@ public class ReportPanel extends JPanel {
         return card;
     }
 
-    /** Xóa bảng chi tiết để load dữ liệu tháng mới. */
+    
     public void clearData() { tableModel.setRowCount(0); }
 
-    /** Thêm một giao dịch vào bảng. */
+    
     public void addRow(Object[] rowData) { tableModel.addRow(rowData); }
 
     private String[] buildMonthOptions() {

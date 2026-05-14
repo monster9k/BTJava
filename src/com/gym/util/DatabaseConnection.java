@@ -17,7 +17,7 @@ public class DatabaseConnection {
         }
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
-   // --- HÀM TEST NHANH ---
+   
    public static void main(String[] args) {
        try (Connection conn = getConnection()) {
            if (conn != null) {

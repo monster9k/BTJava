@@ -5,9 +5,9 @@ import java.util.List;
 
 public interface IUserDAO {
     User login(String username, String password);
-    User findByUsername(String username); // Check tên đăng nhập có tồn tại không
+    User findByUsername(String username); 
     User findById(int id);
-    List<User> findAllStaff(); // Admin xem danh sách nhân viên
+    List<User> findAllStaff(); 
 
     int insert(User user);
     int updatePassword(int userId, String newPassword);

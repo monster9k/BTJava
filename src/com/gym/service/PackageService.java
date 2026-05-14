@@ -8,9 +8,9 @@ import com.gym.util.AppConstants;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * Business logic cho Package quản lý
- */
+
+
+
 public class PackageService {
     private IPackageDAO packageDAO;
 
@@ -18,30 +18,30 @@ public class PackageService {
         this.packageDAO = new PackageDAOImpl();
     }
 
-    /**
-     * Lấy tất cả gói tập khả dụng (status = active)
-     */
+    
+
+
     public List<GymPackage> getActivePackages() {
         return packageDAO.findAllActive();
     }
 
-    /**
-     * Lấy tất cả gói tập kể cả inactive
-     */
+    
+
+
     public List<GymPackage> getAllPackages() {
         return packageDAO.findAll();
     }
 
-    /**
-     * Lấy thông tin gói theo ID
-     */
+    
+
+
     public GymPackage getPackageById(int id) {
         return packageDAO.findById(id);
     }
 
-    /**
-     * Thêm gói tập mới
-     */
+    
+
+
     public boolean addPackage(String packageName, int durationDays, BigDecimal price, String description) {
         if (packageName == null || packageName.trim().isEmpty()) {
             System.out.println("Tên gói tập không được rỗng");
@@ -69,9 +69,9 @@ public class PackageService {
         return result > 0;
     }
 
-    /**
-     * Cập nhật thông tin gói
-     */
+    
+
+
     public boolean updatePackage(int id, String packageName, int durationDays, BigDecimal price, String description) {
         if (packageName == null || packageName.trim().isEmpty()) {
             System.out.println("Tên gói tập không được rỗng");
@@ -103,9 +103,9 @@ public class PackageService {
         return result > 0;
     }
 
-    /**
-     * Bật/Tắt gói tập
-     */
+    
+
+
     public boolean togglePackageStatus(int id, boolean status) {
         GymPackage pkg = packageDAO.findById(id);
         if (pkg == null) {
@@ -117,25 +117,25 @@ public class PackageService {
         return result > 0;
     }
 
-    /**
-     * Kiểm tra gói đang active không
-     */
+    
+
+
     public boolean isActivePackage(int packageId) {
         GymPackage pkg = packageDAO.findById(packageId);
         return pkg != null && pkg.isStatus();
     }
 
-    /**
-     * Lấy giá gói
-     */
+    
+
+
     public BigDecimal getPackagePrice(int packageId) {
         GymPackage pkg = packageDAO.findById(packageId);
         return pkg != null ? pkg.getPrice() : BigDecimal.ZERO;
     }
 
-    /**
-     * Lấy số ngày của gói
-     */
+    
+
+
     public int getPackageDuration(int packageId) {
         GymPackage pkg = packageDAO.findById(packageId);
         return pkg != null ? pkg.getDurationDays() : 0;

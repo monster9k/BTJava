@@ -12,10 +12,10 @@ import com.gym.service.UserService;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * MemberManagementPanel.java
- * Panel quản lý hội viên: tìm kiếm, bảng danh sách, nút thêm hội viên.
- */
+
+
+
+
 public class MemberManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
@@ -34,7 +34,7 @@ public class MemberManagementPanel extends JPanel {
     }
 
     private void build() {
-        // --- Header + Search Bar ---
+        
         JPanel header = new JPanel(new BorderLayout(12, 0));
         header.setBackground(BG_DARK);
 
@@ -60,7 +60,7 @@ public class MemberManagementPanel extends JPanel {
         header.add(searchBar, BorderLayout.EAST);
         add(header, BorderLayout.NORTH);
 
-        // --- Table ---
+        
         String[] cols = {"Mã HV","Họ tên","Tài khoản","SĐT","Giới tính","Ngày sinh","Ngày đăng ký","Trạng thái","Thao tác"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }

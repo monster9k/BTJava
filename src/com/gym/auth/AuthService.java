@@ -13,7 +13,7 @@ public class AuthService {
         this.userDAO = new UserDAOImpl();
     }
 
-    // Xử lý Đăng nhập
+    
     public boolean login(String username, String rawPassword) {
         if (username.isEmpty() || rawPassword.isEmpty()) return false;
 
@@ -27,7 +27,7 @@ public class AuthService {
         return false;
     }
 
-    // Xử lý Đăng ký tài khoản
+    
     public boolean register(String username, String rawPassword, String fullName, String phone, int roleId) {
         if (username.isEmpty() || rawPassword.isEmpty() || fullName.isEmpty()) {
             System.out.println("✗ Register: Empty input");
@@ -71,7 +71,7 @@ public class AuthService {
         return true;
     }
 
-    // Kiểm tra username đã tồn tại trong database
+    
     public boolean checkUsernameExists(String username) {
         User user = userDAO.findByUsername(username);
         return user != null;

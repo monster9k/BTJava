@@ -9,11 +9,11 @@ import com.gym.service.PackageService;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * AddPackageDialog.java
- * Dialog thêm gói tập mới.
- * Mở bằng: new AddPackageDialog(parentFrame).setVisible(true);
- */
+
+
+
+
+
 public class AddPackageDialog extends JDialog {
     private final PackageService packageService = new PackageService();
     private final Runnable onSaved;

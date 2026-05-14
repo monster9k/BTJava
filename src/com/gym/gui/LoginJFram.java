@@ -1,6 +1,6 @@
 package com.gym.gui;
 
-//import com.gym.entity.User;
+
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -15,9 +15,9 @@ import com.gym.gui.Staff.*;
 import com.gym.util.AppConstants;
 
 
-/**
- * LoginJFrame - Màn hình đăng nhập sử dụng Swing
- */
+
+
+
 
 public class LoginJFram extends JFrame {
 
@@ -28,7 +28,7 @@ public class LoginJFram extends JFrame {
     private JPasswordField txtPassword;
     private JButton btnLogin;
     private JLabel lblError;
-    private JButton btnRegister; // New register button
+    private JButton btnRegister; 
     private final AuthService authService = new AuthService();
 
     public LoginJFram() {
@@ -89,12 +89,12 @@ public class LoginJFram extends JFrame {
         }
     }
 
-    // New registration handler
+    
     private void handleRegister() {
         new RegisterDialog(this).setVisible(true);
     }
 
-    // PANEL TRÁI — Logo và Slogan
+    
     private JPanel buildLeftPanel() {
         JPanel root = new JPanel(new BorderLayout());
         root.setBackground(new Color(22, 22, 30));
@@ -129,7 +129,7 @@ public class LoginJFram extends JFrame {
         return root;
     }
 
-    // PANEL PHẢI — Form đăng nhập
+    
     private JPanel buildRightPanel() {
         JPanel root = new JPanel(new BorderLayout());
         root.setBackground(new Color(245, 246, 250));
@@ -160,7 +160,7 @@ public class LoginJFram extends JFrame {
         txtPassword.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
         txtPassword.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Login button
+        
         btnLogin = new JButton(" ĐĂNG NHẬP ");
         btnLogin.setFont(new Font("Tahoma", Font.BOLD, 14));
         btnLogin.setBackground(new Color(255, 193, 7));
@@ -169,7 +169,7 @@ public class LoginJFram extends JFrame {
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogin.addActionListener(e -> handleLogin());
 
-        // Register button/link
+        
         btnRegister = new JButton("Chưa có tài khoản? ĐĂNG KÝ");
         btnRegister.setFont(new Font("Tahoma", Font.PLAIN, 12));
         btnRegister.setBackground(new Color(245, 246, 250));
@@ -215,7 +215,7 @@ public class LoginJFram extends JFrame {
         setResizable(false);
     }
 
-    // New Registration Dialog Class
+    
     private class RegisterDialog extends JDialog {
         private JTextField txtRegUsername, txtRegFullname, txtRegPhone;
         private JPasswordField txtRegPassword, txtRegConfirmPassword;
@@ -228,7 +228,7 @@ public class LoginJFram extends JFrame {
         }
 
         private void initComponents() {
-            setSize(450, 600); // Reduced height since email is removed
+            setSize(450, 600); 
             setLocationRelativeTo(null);
             setLayout(new BorderLayout());
 
@@ -239,15 +239,15 @@ public class LoginJFram extends JFrame {
             JPanel form = new JPanel();
             form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
             form.setBackground(new Color(245, 246, 250));
-            form.setPreferredSize(new Dimension(370, 350)); // Reduced height
+            form.setPreferredSize(new Dimension(370, 350)); 
 
-            // Title
+            
             JLabel lblTitle = new JLabel("TẠO TÀI KHOẢN MỚI");
             lblTitle.setFont(new Font("Tahoma", Font.BOLD, 20));
             lblTitle.setForeground(new Color(22, 22, 30));
             lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Fullname
+            
             JLabel lblFullname = new JLabel("Họ và tên:");
             lblFullname.setFont(new Font("Tahoma", Font.BOLD, 12));
             lblFullname.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -255,7 +255,7 @@ public class LoginJFram extends JFrame {
             txtRegFullname.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
             txtRegFullname.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Phone
+            
             JLabel lblPhone = new JLabel("Số điện thoại:");
             lblPhone.setFont(new Font("Tahoma", Font.BOLD, 12));
             lblPhone.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -263,7 +263,7 @@ public class LoginJFram extends JFrame {
             txtRegPhone.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
             txtRegPhone.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Username
+            
             JLabel lblUsername = new JLabel("Tên đăng nhập:");
             lblUsername.setFont(new Font("Tahoma", Font.BOLD, 12));
             lblUsername.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -271,7 +271,7 @@ public class LoginJFram extends JFrame {
             txtRegUsername.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
             txtRegUsername.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Password
+            
             JLabel lblPassword = new JLabel("Mật khẩu:");
             lblPassword.setFont(new Font("Tahoma", Font.BOLD, 12));
             lblPassword.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -279,13 +279,13 @@ public class LoginJFram extends JFrame {
             txtRegPassword.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
             txtRegPassword.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Password requirement note
+            
             JLabel lblPasswordNote = new JLabel("(* Mật khẩu phải có ít nhất 6 ký tự)");
             lblPasswordNote.setFont(new Font("Tahoma", Font.PLAIN, 10));
             lblPasswordNote.setForeground(new Color(140, 140, 160));
             lblPasswordNote.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Confirm Password
+            
             JLabel lblConfirmPassword = new JLabel("Xác nhận mật khẩu:");
             lblConfirmPassword.setFont(new Font("Tahoma", Font.BOLD, 12));
             lblConfirmPassword.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -293,12 +293,12 @@ public class LoginJFram extends JFrame {
             txtRegConfirmPassword.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
             txtRegConfirmPassword.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Error label
+            
             lblRegError = new JLabel(" ");
             lblRegError.setForeground(Color.RED);
             lblRegError.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Buttons
+            
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             buttonPanel.setBackground(new Color(245, 246, 250));
             
@@ -323,7 +323,7 @@ public class LoginJFram extends JFrame {
             buttonPanel.add(Box.createHorizontalStrut(20));
             buttonPanel.add(btnRegister);
 
-            // Add components to form (EMAIL REMOVED)
+            
             form.add(Box.createVerticalGlue());
             form.add(lblTitle);
             form.add(Box.createRigidArea(new Dimension(0, 25)));
@@ -367,7 +367,7 @@ public class LoginJFram extends JFrame {
             String password = new String(txtRegPassword.getPassword());
             String confirmPassword = new String(txtRegConfirmPassword.getPassword());
 
-            // Validation (EMAIL REMOVED)
+            
             if (fullname.isEmpty() || username.isEmpty() || password.isEmpty()) {
                 lblRegError.setText("Vui lòng điền đầy đủ thông tin!");
                 return;
@@ -384,7 +384,7 @@ public class LoginJFram extends JFrame {
                 return;
             }
 
-            // Check if username already exists in database
+            
             boolean usernameExists = authService.checkUsernameExists(username);
             if (usernameExists) {
                 lblRegError.setText("Tên đăng nhập đã tồn tại!");

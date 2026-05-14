@@ -7,16 +7,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 
-/**
- * AppStyle.java
- * Tập trung toàn bộ màu sắc, font chữ và các helper UI dùng chung.
- * Tất cả thành viên đều là public static để dùng thoải mái từ bất kỳ class nào.
- */
+
+
+
+
+
 public final class AppStyle {
 
-    private AppStyle() {} // Không cho phép khởi tạo
+    private AppStyle() {} 
 
-    // ===== MÀU SẮC CHỦ ĐẠO =====
+    
     public static final Color BG_DARK       = uiColor("Panel.background", Color.LIGHT_GRAY);
     public static final Color SIDEBAR_BG    = uiColor("Panel.background", Color.LIGHT_GRAY);
     public static final Color CARD_BG       = uiColor("Panel.background", Color.LIGHT_GRAY);
@@ -31,7 +31,7 @@ public final class AppStyle {
     public static final Color SIDEBAR_HOVER = new Color(220, 220, 220);
     public static final Color SIDEBAR_ACTIVE = new Color(210, 210, 210);
 
-    // ===== FONT =====
+    
     public static final Font FONT_TITLE   = new Font("Segoe UI", Font.BOLD, 22);
     public static final Font FONT_MENU    = new Font("Segoe UI", Font.PLAIN, 14);
     public static final Font FONT_MENU_B  = new Font("Segoe UI", Font.BOLD, 14);
@@ -41,7 +41,7 @@ public final class AppStyle {
     public static final Font FONT_NORMAL  = new Font("Segoe UI", Font.PLAIN, 13);
     public static final Font FONT_SMALL   = new Font("Segoe UI", Font.PLAIN, 11);
 
-    // ==================== BUTTON ====================
+    
 
     public static JButton makeActionButton(String text, Color color) {
         JButton btn = new JButton(text);
@@ -56,7 +56,7 @@ public final class AppStyle {
         return btn;
     }
 
-    // ==================== TEXT FIELD ====================
+    
 
     public static JTextField makeStyledTextField(String placeholder, int cols) {
         JTextField tf = new JTextField(cols);
@@ -80,7 +80,7 @@ public final class AppStyle {
         return tf;
     }
 
-    // ==================== COMBO BOX ====================
+    
 
     public static <T> JComboBox<T> makeStyledCombo(T[] items) {
         JComboBox<T> cb = new JComboBox<>(items);
@@ -89,7 +89,7 @@ public final class AppStyle {
         return cb;
     }
 
-    // ==================== PASSWORD FIELD ====================
+    
 
     public static void stylePasswordField(JPasswordField pf) {
         pf.setBackground(uiColor("TextField.background", Color.WHITE));
@@ -102,7 +102,7 @@ public final class AppStyle {
         }
     }
 
-    // ==================== DATE PICKER ====================
+    
 
     public static JSpinner makeDatePicker() {
         SpinnerDateModel model = new SpinnerDateModel();
@@ -112,7 +112,7 @@ public final class AppStyle {
         return spinner;
     }
 
-    // ==================== LABEL HELPERS ====================
+    
 
     public static JLabel styledLabel(String text) {
         JLabel l = new JLabel(text);
@@ -128,7 +128,7 @@ public final class AppStyle {
         return l;
     }
 
-    // ==================== TEXT AREA ====================
+    
 
     public static JPanel makeStyledTextArea(String placeholder, int rows, int cols) {
         JTextArea ta = new JTextArea(rows, cols);
@@ -159,7 +159,7 @@ public final class AppStyle {
         return wrapper;
     }
 
-    // ==================== TABLE HELPERS ====================
+    
 
     public static JTable makeStyledTable(String[] cols, Object[][] data) {
         DefaultTableModel model = new DefaultTableModel(data, cols) {
@@ -194,7 +194,7 @@ public final class AppStyle {
         return scroll;
     }
 
-    // ==================== ROUNDED BORDER ====================
+    
 
     public static class RoundedBorder extends AbstractBorder {
         private final Color color;

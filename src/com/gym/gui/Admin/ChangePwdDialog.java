@@ -9,11 +9,11 @@ import com.gym.service.UserService;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * ChangePwdDialog.java
- * Dialog đổi mật khẩu admin.
- * Mở bằng: new ChangePwdDialog(parentFrame).setVisible(true);
- */
+
+
+
+
+
 public class ChangePwdDialog extends JDialog {
     private final UserService userService = new UserService();
 

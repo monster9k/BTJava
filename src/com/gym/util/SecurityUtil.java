@@ -4,10 +4,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class SecurityUtil {
-    /**
-     * Hash mật khẩu dùng MD5
-     * Lưu ý: MD5 không an toàn, nên dùng BCrypt hoặc Argon2 trong production
-     */
+    
+
+
+
     public static String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");

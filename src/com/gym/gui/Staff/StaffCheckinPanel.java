@@ -23,19 +23,19 @@ import java.time.format.DateTimeFormatter;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * StaffCheckinPanel.java
- * Màn hình check-in khách — chức năng trọng tâm của Staff.
- *
- * Layout:
- *  ┌─────────────────────────────────────────────────────────────┐
- *  │  [Thanh tìm kiếm rộng — nhập mã HV hoặc SĐT + nút Tìm]    │
- *  ├──────────────────────────────┬──────────────────────────────┤
- *  │  Card thông tin hội viên     │  Bảng lịch sử check-in       │
- *  │  + badge trạng thái          │  hôm nay                     │
- *  │  + nút XÁC NHẬN lớn         │                              │
- *  └──────────────────────────────┴──────────────────────────────┘
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
 public class StaffCheckinPanel extends JPanel {
 
     private final StaffDashboard owner;
@@ -58,15 +58,15 @@ public class StaffCheckinPanel extends JPanel {
         build();
     }
 
-    // ===================================================================
+    
     private void build() {
         add(buildTitleRow(),  BorderLayout.NORTH);
         add(buildBody(),      BorderLayout.CENTER);
     }
 
-    // ===================================================================
-    //  TITLE ROW
-    // ===================================================================
+    
+    
+    
     private JPanel buildTitleRow() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(BG_DARK);
@@ -89,9 +89,9 @@ public class StaffCheckinPanel extends JPanel {
         return p;
     }
 
-    // ===================================================================
-    //  BODY = search + 2 cột
-    // ===================================================================
+    
+    
+    
     private JPanel buildBody() {
         JPanel body = new JPanel(new BorderLayout(0, 14));
         body.setBackground(BG_DARK);
@@ -105,9 +105,9 @@ public class StaffCheckinPanel extends JPanel {
         return body;
     }
 
-    // ===================================================================
-    //  SEARCH BAR
-    // ===================================================================
+    
+    
+    
     private JPanel buildSearchBar() {
         JPanel bar = new JPanel(new BorderLayout(10, 0));
         bar.setBackground(CARD_BG);
@@ -137,7 +137,7 @@ public class StaffCheckinPanel extends JPanel {
                 }
             }
         });
-        searchField.addActionListener(e -> doSearch()); // Enter key
+        searchField.addActionListener(e -> doSearch()); 
 
         JButton btnSearch = makeActionButton("Tìm kiếm", StaffDashboard.STAFF_ACCENT);
         Color buttonFg = UIManager.getColor("Button.foreground");
@@ -149,9 +149,9 @@ public class StaffCheckinPanel extends JPanel {
         return bar;
     }
 
-    // ===================================================================
-    //  MEMBER CARD (cột trái)
-    // ===================================================================
+    
+    
+    
     private JPanel buildMemberCard() {
         memberCard = new JPanel(new BorderLayout(0, 14));
         memberCard.setBackground(CARD_BG);
@@ -163,7 +163,7 @@ public class StaffCheckinPanel extends JPanel {
         return memberCard;
     }
 
-    /** Trạng thái chờ — chưa tìm kiếm */
+    
     private void renderEmptyState() {
         memberCard.removeAll();
         JPanel center = new JPanel(new GridBagLayout());
@@ -198,14 +198,14 @@ public class StaffCheckinPanel extends JPanel {
         memberCard.repaint();
     }
 
-    /** Render thông tin hội viên sau khi tìm thấy */
+    
     private void renderMemberFound(String memberId, String name, String phone,
                                     String pkg, String expiry, boolean allowed) {
         memberCard.removeAll();
         Color ac = allowed ? StaffDashboard.STAFF_ACCENT : ACCENT_RED;
         String statusTxt = allowed ? "DUOC PHEP VAO TAP" : "GOI HET HAN / BI KHOA";
 
-        // --- Badge trạng thái ---
+        
         JPanel badge = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         badge.setBackground(new Color(ac.getRed(), ac.getGreen(), ac.getBlue(), 22));
         badge.setBorder(new CompoundBorder(
@@ -217,7 +217,7 @@ public class StaffCheckinPanel extends JPanel {
         badgeLbl.setForeground(ac);
         badge.add(badgeLbl);
 
-        // --- Avatar + Tên ---
+        
         JLabel av = new JLabel("TH");
         av.setFont(new Font("Segoe UI", Font.BOLD, 18));
         av.setHorizontalAlignment(SwingConstants.CENTER);
@@ -245,7 +245,7 @@ public class StaffCheckinPanel extends JPanel {
         avBlock.add(Box.createVerticalStrut(3));
         avBlock.add(idLbl);
 
-        // --- Chi tiết gói ---
+        
         JPanel details = new JPanel(new GridLayout(3, 2, 6, 8));
         details.setBackground(new Color(35, 40, 58));
         details.setBorder(new CompoundBorder(
@@ -262,7 +262,7 @@ public class StaffCheckinPanel extends JPanel {
         stLbl.setForeground(ac);
         details.add(stLbl);
 
-        // --- Nút xác nhận ---
+        
         JButton btnConfirm = new JButton(allowed ? "XAC NHAN CHECK-IN" : "LIEN HE QUAN LY");
         btnConfirm.setFont(new Font("Segoe UI", Font.BOLD, 14));
         Color btnFg = UIManager.getColor("Button.foreground");
@@ -278,7 +278,7 @@ public class StaffCheckinPanel extends JPanel {
         btnConfirm.setPreferredSize(new Dimension(0, 44));
         btnConfirm.addActionListener(e -> doConfirmCheckin(memberId, name, pkg));
 
-        // --- Ghép layout ---
+        
         JPanel south = new JPanel(new BorderLayout(0, 10));
         south.setOpaque(false);
         south.add(details,    BorderLayout.CENTER);
@@ -291,9 +291,9 @@ public class StaffCheckinPanel extends JPanel {
         memberCard.repaint();
     }
 
-    // ===================================================================
-    //  HISTORY PANEL (cột phải)
-    // ===================================================================
+    
+    
+    
     private JPanel buildHistoryPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 10));
         panel.setBackground(CARD_BG);
@@ -345,9 +345,9 @@ public class StaffCheckinPanel extends JPanel {
         checkinCountLabel.setText("Hôm nay: " + checkinCount + " lượt");
     }
 
-    // ===================================================================
-    //  LOGIC TÌM KIẾM (giả lập — thay bằng DAO thật)
-    // ===================================================================
+    
+    
+    
     private void doSearch() {
         String query = searchField.getText().trim();
         if (query.isEmpty() || query.startsWith("Nhập mã")) return;
@@ -439,9 +439,9 @@ public class StaffCheckinPanel extends JPanel {
         memberCard.repaint();
     }
 
-    // ===================================================================
-    //  LOGIC XÁC NHẬN CHECK-IN
-    // ===================================================================
+    
+    
+    
     private void doConfirmCheckin(String memberId, String name, String pkg) {
         Member member = memberService.getMemberByCode(memberId);
         if (member == null) {

@@ -18,11 +18,11 @@ import java.awt.*;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * CheckinPanel.java
- * Panel xử lý check-in: form tìm kiếm hội viên, hiển thị thông tin và
- * lịch sử check-in trong ngày.
- */
+
+
+
+
+
 public class CheckinPanel extends JPanel {
 
     private DefaultTableModel historyModel;
@@ -45,14 +45,14 @@ public class CheckinPanel extends JPanel {
     }
 
     private void build() {
-        // --- Title ---
+        
         JLabel title = new JLabel("Xử lý Check-in");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
         title.setBorder(new EmptyBorder(0, 0, 8, 0));
         add(title, BorderLayout.NORTH);
 
-        // --- Form Card ---
+        
         JPanel formCard = new JPanel(new GridBagLayout());
         formCard.setBackground(CARD_BG);
         formCard.setBorder(new CompoundBorder(
@@ -74,7 +74,7 @@ public class CheckinPanel extends JPanel {
         gbc.gridy=1; gbc.gridwidth=1;               formCard.add(tfSearch, gbc);
         gbc.gridx=1;                                formCard.add(btnFind, gbc);
 
-        // Kết quả tìm kiếm
+        
         JPanel resultCard = new JPanel(new GridLayout(0, 2, 8, 8));
         resultCard.setBackground(CARD_BG);
         resultCard.setBorder(new CompoundBorder(
@@ -109,12 +109,12 @@ public class CheckinPanel extends JPanel {
 
         add(formCard, BorderLayout.CENTER);
 
-        // --- Lịch sử check-in hôm nay ---
+        
         String[] cols = {"STT","Mã HV","Họ tên","Gói tập","Giờ check-in"};
         historyModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
-        // Lịch sử sẽ được load động từ DB (mặc định trống)
+        
 
         JTable table = new JTable(historyModel);
         styleTableAppearance(table);
@@ -125,12 +125,12 @@ public class CheckinPanel extends JPanel {
         add(scroll, BorderLayout.SOUTH);
     }
 
-    /** Thêm bản ghi check-in vào bảng lịch sử. */
+    
     public void addCheckinRecord(String stt, String memberId, String name, String pkg, String time) {
         historyModel.addRow(new Object[]{stt, memberId, name, pkg, time});
     }
 
-    /** Xóa lịch sử để load lại từ đầu ngày. */
+    
     public void clearHistory() { historyModel.setRowCount(0); }
 
     private void doSearch() {

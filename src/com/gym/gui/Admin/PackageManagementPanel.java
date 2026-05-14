@@ -13,10 +13,10 @@ import com.gym.service.PackageService;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * PackageManagementPanel.java
- * Panel quản lý gói tập. Hiển thị bảng danh sách gói + nút Thêm gói tập.
- */
+
+
+
+
 public class PackageManagementPanel extends JPanel {
 
     private DefaultTableModel tableModel;
@@ -37,7 +37,7 @@ public class PackageManagementPanel extends JPanel {
     }
 
     private void build() {
-        // --- Toolbar ---
+        
         JPanel toolBar = new JPanel(new BorderLayout());
         toolBar.setBackground(BG_DARK);
         JLabel title = new JLabel("Quản lý Gói tập");
@@ -49,7 +49,7 @@ public class PackageManagementPanel extends JPanel {
         toolBar.add(btnAdd, BorderLayout.EAST);
         add(toolBar, BorderLayout.NORTH);
 
-        // --- Table ---
+        
         String[] cols = {"ID", "Tên gói", "Thời hạn (ngày)", "Giá (VNĐ)", "Mô tả", "Trạng thái", "Thao tác"};
         tableModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
@@ -70,9 +70,9 @@ public class PackageManagementPanel extends JPanel {
         add(makeScrollPane(table), BorderLayout.CENTER);
     }
 
-    /**
-     * Load dữ liệu package từ database
-     */
+    
+
+
     private void loadPackagesFromDB() {
         try {
             clearData();

@@ -8,18 +8,18 @@ import com.gym.service.UserService;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * AddMemberDialog.java
- * Dialog thêm hội viên mới.
- * Mở bằng: new AddMemberDialog(parentFrame).setVisible(true);
- */
+
+
+
+
+
 public class AddMemberDialog extends JDialog {
     private final MemberService memberService = new MemberService();
     private final UserService userService = new UserService();
 
     public AddMemberDialog(JFrame parent) {
         super(parent, "Thêm Hội Viên Mới", true);
-        // Đã điều chỉnh: Tăng chiều rộng lên 800, Giảm chiều cao xuống 600 an toàn cho mọi màn hình
+        
         setSize(800, 600);
         setLocationRelativeTo(parent);
         getContentPane().setBackground(CARD_BG);
@@ -74,64 +74,64 @@ public class AddMemberDialog extends JDialog {
         JSpinner spBirthday  = makeDatePicker();
         JSpinner spCreatedAt = makeDatePicker();
 
-        // --- SẮP XẾP LAYOUT 2 CỘT ---
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets  = new Insets(8, 15, 8, 15);
         gbc.fill    = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0.5; // Dàn đều 50% mỗi cột
+        gbc.weightx = 0.5; 
 
         int row = 0;
 
-        // Dòng 1
+        
         gbc.gridy = row; gbc.gridx = 0; add(styledLabel("Mã hội viên:"), gbc);
         gbc.gridx = 1; add(styledLabel("Ngày đăng ký:"), gbc);
 
-        // Dòng 2
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(tfMemberCode, gbc);
         gbc.gridx = 1; add(spCreatedAt, gbc);
 
-        // Dòng 3
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(styledLabel("Họ và tên:"), gbc);
         gbc.gridx = 1; add(cbCreateAccount, gbc);
 
-        // Dòng 4
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(tfFullName, gbc);
         gbc.gridx = 1; add(styledLabel("Tên đăng nhập:"), gbc);
 
-        // Dòng 5
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(styledLabel("Số điện thoại:"), gbc);
         gbc.gridx = 1; add(tfUsername, gbc);
 
-        // Dòng 6
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(tfPhone, gbc);
         gbc.gridx = 1; add(styledLabel("Mật khẩu:"), gbc);
 
-        // Dòng 7
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(styledLabel("Giới tính:"), gbc);
         gbc.gridx = 1; add(pfPassword, gbc);
 
-        // Dòng 8
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(cbGender, gbc);
         gbc.gridx = 1; add(cbLinkAccount, gbc);
 
-        // Dòng 9
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(styledLabel("Ngày sinh (dd/MM/yyyy):"), gbc);
         gbc.gridx = 1; add(styledLabel("Username liên kết:"), gbc);
 
-        // Dòng 10
+        
         row++;
         gbc.gridy = row; gbc.gridx = 0; add(spBirthday, gbc);
         gbc.gridx = 1; add(tfLinkUsername, gbc);
 
-        // --- NÚT LƯU CHIẾM 2 CỘT ---
+        
         JButton btnSave = makeActionButton("Lưu hội viên", ACCENT_GREEN);
         btnSave.addActionListener(e -> {
             String name = tfFullName.getText().trim();
@@ -197,7 +197,7 @@ public class AddMemberDialog extends JDialog {
         row++;
         gbc.gridy = row;
         gbc.gridx = 0;
-        gbc.gridwidth = 2; // Gộp 2 cột lại để chứa nút Lưu
+        gbc.gridwidth = 2; 
         gbc.insets = new Insets(25, 15, 20, 15);
         add(btnSave, gbc);
     }

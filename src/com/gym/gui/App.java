@@ -9,7 +9,7 @@ public class App {
             @Override
             public void run() {
                 try {
-                    // Khởi động cửa sổ đăng nhập
+                    
                     LoginJFram frame = new LoginJFram();
                     frame.setVisible(true);
                     

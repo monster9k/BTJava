@@ -12,42 +12,42 @@ import com.gym.gui.AppStyle.RoundedBorder;
 import com.gym.gui.LoginJFram;
 import com.gym.gui.Staff.*;
  
-/**
- * AdminDashboard.java  ← Main Frame (khung điều hướng duy nhất)
- *
- * Chỉ chứa:
- *   - Sidebar + menu navigation
- *   - Top bar (tiêu đề trang + thông tin admin)
- *   - contentPanel — nơi swap các Panel con
- *
- * Mọi logic UI chi tiết đã được tách ra:
- *   AppStyle                  → màu sắc, font, helper UI
- *   DashboardPanel            → tổng quan
- *   StaffManagementPanel      → quản lý nhân viên
- *   PackageManagementPanel    → quản lý gói tập
- *   ReportPanel               → báo cáo doanh thu
- *   MemberManagementPanel     → quản lý hội viên
- *   SubscriptionPanel         → đăng ký / gia hạn
- *   CheckinPanel              → check-in
- *   AddStaffDialog            → dialog thêm nhân viên
- *   AddMemberDialog           → dialog thêm hội viên
- *   AddPackageDialog          → dialog thêm gói tập
- *   AddSubscriptionDialog     → dialog đăng ký gói
- *   ChangePwdDialog           → dialog đổi mật khẩu
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public class AdminDashboard extends JFrame {
  
     private JPanel  contentPanel;
     private final String adminName;
     private JButton activeMenuBtn = null;
  
-    // ===== CONSTRUCTOR =====
+    
     public AdminDashboard(String adminName) {
         this.adminName = adminName;
         initUI();
     }
  
-    // ===== KHỞI TẠO FRAME =====
+    
     private void initUI() {
         setTitle("GymPro - Quản Trị Hệ Thống");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,10 +70,10 @@ public class AdminDashboard extends JFrame {
  
         add(mainArea, BorderLayout.CENTER);
  
-        showDashboard(); // Mặc định
+        showDashboard(); 
     }
  
-    // ===== SIDEBAR =====
+    
     private JPanel buildSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setOpaque(true);
@@ -82,7 +82,7 @@ public class AdminDashboard extends JFrame {
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setBorder(new MatteBorder(0, 0, 0, 1, DIVIDER));
  
-        // Logo
+        
         JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 18));
         logoPanel.setBackground(SIDEBAR_BG);
         logoPanel.setMaximumSize(new Dimension(220, 70));
@@ -95,7 +95,7 @@ public class AdminDashboard extends JFrame {
         sidebar.add(makeDivider());
         sidebar.add(Box.createVerticalStrut(8));
  
-        // Menu buttons
+        
         JButton btnDashboard = makeMenuButton("  Dashboard",              true);
         JButton btnStaff     = makeMenuButton("  Quản lý Nhân viên",     false);
         JButton btnPackages  = makeMenuButton("  Quản lý Gói tập",       false);
@@ -131,7 +131,7 @@ public class AdminDashboard extends JFrame {
 
         sidebar.add(Box.createVerticalStrut(16));
  
-        // Events
+        
         activeMenuBtn = btnDashboard;
         setActiveMenu(btnDashboard);
  
@@ -150,7 +150,7 @@ public class AdminDashboard extends JFrame {
         return sidebar;
     }
  
-    /** Đặt trạng thái active cho nút menu được chọn. */
+    
     private void setActiveMenu(JButton btn) {
         if (activeMenuBtn != null) {
             activeMenuBtn.setBackground(SIDEBAR_BG);
@@ -211,7 +211,7 @@ public class AdminDashboard extends JFrame {
         return sep;
     }
  
-    // ===== TOP BAR =====
+    
     private JPanel buildTopBar() {
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(SIDEBAR_BG);
@@ -253,17 +253,17 @@ public class AdminDashboard extends JFrame {
         return topBar;
     }
  
-    // ===== NAVIGATION HELPERS =====
+    
  
-    /** Hiển thị DashboardPanel (mặc định khi mở). */
+    
     private void showDashboard() {
         showPanel(new DashboardPanel());
     }
  
-    /**
-     * Swap nội dung contentPanel sang panel mới.
-     * Gọi từ bất kỳ menu button nào.
-     */
+    
+
+
+
     private void showPanel(JPanel panel) {
         contentPanel.removeAll();
         contentPanel.add(panel, BorderLayout.CENTER);
@@ -271,7 +271,7 @@ public class AdminDashboard extends JFrame {
         contentPanel.repaint();
     }
  
-    // ===== ĐĂNG XUẤT =====
+    
     private void confirmLogout() {
         int confirm = JOptionPane.showConfirmDialog(
             this, "Bạn có chắc muốn đăng xuất?", "Xác nhận",

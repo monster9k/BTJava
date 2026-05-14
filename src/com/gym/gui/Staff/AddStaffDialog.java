@@ -9,11 +9,11 @@ import com.gym.util.AppConstants;
 
 import static com.gym.gui.AppStyle.*;
 
-/**
- * AddStaffDialog.java
- * Dialog thêm nhân viên mới.
- * Mở bằng: new AddStaffDialog(parentFrame).setVisible(true);
- */
+
+
+
+
+
 public class AddStaffDialog extends JDialog {
     private final UserService userService = new UserService();
 
