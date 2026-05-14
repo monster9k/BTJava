@@ -111,10 +111,10 @@ public class AdminDashboard extends JFrame {
         sidebar.add(Box.createVerticalStrut(4));
         sidebar.add(makeSectionLabel("QUẢN LÝ"));
         sidebar.add(btnStaff);
+        sidebar.add(btnMembers);
         sidebar.add(btnPackages);
         sidebar.add(Box.createVerticalStrut(4));
         sidebar.add(makeSectionLabel("NGHIỆP VỤ"));
-        sidebar.add(btnMembers);
         sidebar.add(btnSubs);
         sidebar.add(btnCheckin);
         sidebar.add(Box.createVerticalStrut(4));
