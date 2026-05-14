@@ -17,7 +17,7 @@ import static com.gym.gui.AppStyle.*;
  *
  * Cách update dữ liệu:
  *   panel.clearData();
- *   panel.addRow(new Object[]{"U006","staff05","Lê Thị F","STAFF","✅ Active","Sửa | Khóa"});
+ *   panel.addRow(new Object[]{"U006","staff05","Lê Thị F","STAFF","Active","Sửa | Khóa"});
  */
 public class StaffManagementPanel extends JPanel {
 
@@ -41,7 +41,7 @@ public class StaffManagementPanel extends JPanel {
         JLabel title = new JLabel("Quản lý Nhân viên");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
-        JButton btnAdd = makeActionButton("➕ Thêm nhân viên", ACCENT_BLUE);
+        JButton btnAdd = makeActionButton("Thêm nhân viên", ACCENT_BLUE);
         btnAdd.addActionListener(e -> {
             new AddStaffDialog(owner).setVisible(true);
             loadStaff();
@@ -84,7 +84,7 @@ public class StaffManagementPanel extends JPanel {
         cachedStaff = userService.getAllStaff();
         for (User u : cachedStaff) {
             String role = u.getRoleId() == AppConstants.ROLE_ADMIN ? "ADMIN" : "STAFF";
-            String status = u.isStatus() ? "✅ Active" : "🔴 Locked";
+            String status = u.isStatus() ? "Active" : "Locked";
             addRow(new Object[]{
                     "U" + u.getId(),
                     u.getUsername(),

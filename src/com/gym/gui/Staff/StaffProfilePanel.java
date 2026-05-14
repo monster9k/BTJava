@@ -43,7 +43,7 @@ public class StaffProfilePanel extends JPanel {
     // ===================================================================
     private void build(String displayName) {
         // Title
-        JLabel title = new JLabel("👤  Thông tin cá nhân");
+        JLabel title = new JLabel("Thông tin cá nhân");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
         title.setBorder(new EmptyBorder(0, 0, 4, 0));
@@ -62,12 +62,6 @@ public class StaffProfilePanel extends JPanel {
         scroll.setBackground(BG_DARK);
         scroll.getViewport().setBackground(BG_DARK);
         scroll.setBorder(BorderFactory.createEmptyBorder());
-        scroll.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
-            protected void configureScrollBarColors() {
-                thumbColor = new Color(70, 80, 110);
-                trackColor = BG_DARK;
-            }
-        });
         add(scroll, BorderLayout.CENTER);
     }
 
@@ -76,7 +70,7 @@ public class StaffProfilePanel extends JPanel {
     // ===================================================================
     private JPanel buildInfoCard(String displayName) {
         // wrapper: BoxLayout Y_AXIS — section label trên, inner card dưới
-        JPanel wrapper = makeWrapper("✏️  Thông tin cơ bản");
+        JPanel wrapper = makeWrapper("Thông tin cơ bản");
 
         // inner: GridBagLayout — nơi add các field
         JPanel inner = new JPanel(new GridBagLayout());
@@ -109,8 +103,7 @@ public class StaffProfilePanel extends JPanel {
         inner.add(tfPhone, gbc);
 
         // Nút lưu
-        JButton btnSave = makeActionButton("💾  Lưu thông tin", StaffDashboard.STAFF_ACCENT);
-        btnSave.setForeground(new Color(8, 35, 25));
+        JButton btnSave = makeActionButton("Lưu thông tin", StaffDashboard.STAFF_ACCENT);
         btnSave.addActionListener(e -> saveInfo());
         gbc.gridy  = 6;
         gbc.insets = new Insets(18, 0, 0, 0);
@@ -124,7 +117,7 @@ public class StaffProfilePanel extends JPanel {
     //  CARD 2 — Đổi mật khẩu
     // ===================================================================
     private JPanel buildPasswordCard() {
-        JPanel wrapper = makeWrapper("🔒  Đổi mật khẩu");
+        JPanel wrapper = makeWrapper("Đổi mật khẩu");
 
         JPanel inner = new JPanel(new GridBagLayout());
         inner.setBackground(CARD_BG);
@@ -153,14 +146,14 @@ public class StaffProfilePanel extends JPanel {
         stylePasswordField(pfConfirmPwd);
         inner.add(pfConfirmPwd, gbc);
 
-        JLabel hint = new JLabel("💡 Mật khẩu nên có ít nhất 6 ký tự, bao gồm chữ và số.");
+        JLabel hint = new JLabel("Mật khẩu nên có ít nhất 6 ký tự, bao gồm chữ và số.");
         hint.setFont(FONT_SMALL);
-        hint.setForeground(new Color(100, 110, 150));
+        hint.setForeground(TEXT_GRAY);
         gbc.gridy  = 6;
         gbc.insets = new Insets(4, 0, 0, 0);
         inner.add(hint, gbc);
 
-        JButton btnChange = makeActionButton("🔑  Đổi mật khẩu", ACCENT_ORANGE);
+        JButton btnChange = makeActionButton("Đổi mật khẩu", ACCENT_ORANGE);
         btnChange.addActionListener(e -> savePassword());
         gbc.gridy  = 7;
         gbc.insets = new Insets(18, 0, 0, 0);
@@ -221,7 +214,7 @@ public class StaffProfilePanel extends JPanel {
             return;
         }
         JOptionPane.showMessageDialog(this,
-            "✅  Đã lưu thông tin!\nTên: " + newName + "\nSĐT: " + newPhone,
+            "Đã lưu thông tin!\nTên: " + newName + "\nSĐT: " + newPhone,
             "Thành công", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -250,7 +243,7 @@ public class StaffProfilePanel extends JPanel {
         pfNewPwd.setText("");
         pfConfirmPwd.setText("");
         JOptionPane.showMessageDialog(this,
-            "🔑  Đổi mật khẩu thành công!",
+            "Đổi mật khẩu thành công!",
             "Thành công", JOptionPane.INFORMATION_MESSAGE);
     }
 }

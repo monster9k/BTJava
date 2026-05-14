@@ -29,7 +29,7 @@ import static com.gym.gui.AppStyle.*;
 public class AddSubscriptionDialog extends JDialog {
 
     public AddSubscriptionDialog(JFrame parent) {
-        super(parent, "➕ Đăng Ký Gói Tập Mới", true);
+        super(parent, "Đăng Ký Gói Tập Mới", true);
         setSize(620, 780);
         setLocationRelativeTo(parent);
         getContentPane().setBackground(CARD_BG);
@@ -57,14 +57,6 @@ public class AddSubscriptionDialog extends JDialog {
             pkgModel.addElement(new PackageItem(p));
         }
         JComboBox<PackageItem> cbPackage = new JComboBox<>(pkgModel);
-        cbPackage.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
-            JLabel lbl = new JLabel(value != null ? value.getDisplay() : "");
-            lbl.setOpaque(true);
-            lbl.setBackground(isSelected ? new Color(45, 55, 85) : new Color(35, 40, 60));
-            lbl.setForeground(TEXT_WHITE);
-            lbl.setBorder(new EmptyBorder(6, 10, 6, 10));
-            return lbl;
-        });
 
         JSpinner spStartDate = makeDatePicker();
         spStartDate.setEnabled(false);
@@ -89,7 +81,7 @@ public class AddSubscriptionDialog extends JDialog {
 
         JLabel noteLabel = new JLabel("* Ngày hết hạn tự tính theo thời hạn của gói đã chọn.");
         noteLabel.setFont(FONT_SMALL);
-        noteLabel.setForeground(ACCENT_ORANGE);
+        noteLabel.setForeground(TEXT_GRAY);
 
         int row = 0;
         gbc.gridy = row++; add(styledLabel("Mã hội viên (member_id):"), gbc);
@@ -106,7 +98,7 @@ public class AddSubscriptionDialog extends JDialog {
 
         // Thông tin tự động điền
         JPanel autoFillNote = new JPanel(new GridLayout(0, 1, 0, 4));
-        autoFillNote.setBackground(new Color(35, 40, 60));
+        autoFillNote.setBackground(CARD_BG);
         autoFillNote.setBorder(new CompoundBorder(new RoundedBorder(DIVIDER, 1, 8), new EmptyBorder(10, 14, 10, 14)));
 
         JLabel autoTitle  = new JLabel("Hệ thống tự động điền:");
@@ -116,14 +108,14 @@ public class AddSubscriptionDialog extends JDialog {
 
         for (JLabel l : new JLabel[]{autoTitle, autoEnd, autoStat, autoCreate}) {
             l.setFont(FONT_SMALL);
-            l.setForeground(l == autoTitle ? ACCENT_GREEN : TEXT_GRAY);
+            l.setForeground(l == autoTitle ? TEXT_WHITE : TEXT_GRAY);
             autoFillNote.add(l);
         }
         gbc.gridy = row++;
         gbc.insets = new Insets(10, 15, 8, 15);
         add(autoFillNote, gbc);
 
-        JButton btnSave = makeActionButton("💾 Lưu đăng ký", ACCENT_ORANGE);
+        JButton btnSave = makeActionButton("Lưu đăng ký", ACCENT_ORANGE);
         btnSave.addActionListener(e -> {
             String memberCode = tfMemberId.getText().trim();
             if (memberCode.isEmpty() || memberCode.contains("Nhập mã")) {
@@ -183,6 +175,11 @@ public class AddSubscriptionDialog extends JDialog {
         String getDisplay() {
             String priceText = NumberFormat.getInstance(new Locale("vi", "VN")).format(getPrice());
             return String.format("%s - %s (%d ngày - %sđ)", id, name, duration, priceText);
+        }
+
+        @Override
+        public String toString() {
+            return getDisplay();
         }
     }
 }

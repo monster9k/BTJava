@@ -59,21 +59,33 @@ public class CheckInService {
             return false;
         }
 
-        // Kiểm tra hội viên có gói active
-        Subscription activeSub = subscriptionService.getActiveSubscription(memberId);
+        // Kiểm tra hội viên có gói hợp lệ để check-in
+        Subscription activeSub = subscriptionService.pickSubscriptionForCheckIn(memberId);
         if (activeSub == null) {
-            System.out.println("Hội viên không có gói đang còn hạn");
-            return false;
-        }
-
-        // Kiểm tra gói có hợp lệ để check-in không
-        if (!subscriptionService.isValidForCheckIn(activeSub)) {
-            System.out.println("Gói không hợp lệ: chưa thanh toán hoặc đã hết hạn");
+            System.out.println("Hội viên không có gói hợp lệ để check-in");
             return false;
         }
 
         // Thực hiện check-in
         int result = checkInDAO.log(activeSub.getId());
+        return result > 0;
+    }
+
+    public boolean checkInBySubscription(int memberId, int subscriptionId) {
+        if (!memberService.isActiveMember(memberId)) {
+            System.out.println("Hội viên không tồn tại hoặc đã bị khóa");
+            return false;
+        }
+        Subscription sub = subscriptionService.getSubscriptionById(subscriptionId);
+        if (sub == null || sub.getMemberId() != memberId) {
+            System.out.println("Gói không hợp lệ cho hội viên này");
+            return false;
+        }
+        if (!subscriptionService.isValidForCheckIn(sub)) {
+            System.out.println("Gói không hợp lệ: chưa thanh toán hoặc đã hết hạn");
+            return false;
+        }
+        int result = checkInDAO.log(sub.getId());
         return result > 0;
     }
 
@@ -107,25 +119,25 @@ public class CheckInService {
             return "Hội viên không tồn tại hoặc đã bị khóa";
         }
 
+        List<Subscription> valid = subscriptionService.getValidSubscriptionsForCheckIn(memberId);
+        if (!valid.isEmpty()) {
+            return null;
+        }
+
         Subscription activeSub = subscriptionService.getActiveSubscription(memberId);
         if (activeSub == null) {
             return "Hội viên không có gói đang còn hạn";
         }
 
-        if (!subscriptionService.isValidForCheckIn(activeSub)) {
-            if (activeSub.getPaymentStatus() != 1) {
-                return "Chưa thanh toán, không được check-in";
-            }
-            if (LocalDate.now().isAfter(activeSub.getEndDate())) {
-                return "Gói đã hết hạn";
-            }
-            if (LocalDate.now().isBefore(activeSub.getStartDate())) {
-                return "Gói chưa bắt đầu";
-            }
-            return "Gói không hợp lệ";
+        if (activeSub.getPaymentStatus() != 1) {
+            return "Chưa thanh toán, không được check-in";
         }
-
-        return null; // Hợp lệ
+        if (LocalDate.now().isAfter(activeSub.getEndDate())) {
+            return "Gói đã hết hạn";
+        }
+        if (LocalDate.now().isBefore(activeSub.getStartDate())) {
+            return "Gói chưa bắt đầu";
+        }
+        return "Gói không hợp lệ";
     }
 }
-

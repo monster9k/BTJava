@@ -43,7 +43,7 @@ public class PackageManagementPanel extends JPanel {
         JLabel title = new JLabel("Quản lý Gói tập");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
-        JButton btnAdd = makeActionButton("➕ Thêm gói tập", ACCENT_GREEN);
+        JButton btnAdd = makeActionButton("Thêm gói tập", ACCENT_GREEN);
         btnAdd.addActionListener(e -> new AddPackageDialog(owner, this::loadPackagesFromDB).setVisible(true));
         toolBar.add(title,  BorderLayout.WEST);
         toolBar.add(btnAdd, BorderLayout.EAST);
@@ -79,7 +79,7 @@ public class PackageManagementPanel extends JPanel {
             cachedPackages = packageService.getAllPackages();
 
             for (GymPackage pkg : cachedPackages) {
-                String status = pkg.isStatus() ? "✅ Active" : "🔴 Ẩn";
+                String status = pkg.isStatus() ? "Active" : "Ẩn";
                 String price = currencyFormat.format(pkg.getPrice().doubleValue());
 
                 tableModel.addRow(new Object[]{

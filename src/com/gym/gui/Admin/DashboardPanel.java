@@ -65,10 +65,10 @@ public class DashboardPanel extends JPanel {
         int expiring = subscriptionService.getExpiringSubscriptionsDefault().size();
         int staffCount = userService.getAllStaff().size();
 
-        statsRow.add(makeStatCard("Hội viên Active",    String.valueOf(activeMembers), "đang hoạt động", ACCENT_BLUE,   "🏃"));
-        statsRow.add(makeStatCard("Doanh thu tháng",    revenue, "tháng hiện tại", ACCENT_GREEN,  "💰"));
-        statsRow.add(makeStatCard("Gói sắp hết hạn",   String.valueOf(expiring), "trong 5 ngày tới", ACCENT_ORANGE, "⚠️"));
-        statsRow.add(makeStatCard("Nhân viên",          String.valueOf(staffCount), "đang hoạt động", ACCENT_RED,    "👥"));
+        statsRow.add(makeStatCard("Hội viên Active",    String.valueOf(activeMembers), "đang hoạt động", ACCENT_BLUE,   ""));
+        statsRow.add(makeStatCard("Doanh thu tháng",    revenue, "tháng hiện tại", ACCENT_GREEN,  ""));
+        statsRow.add(makeStatCard("Gói sắp hết hạn",   String.valueOf(expiring), "trong 5 ngày tới", ACCENT_ORANGE, ""));
+        statsRow.add(makeStatCard("Nhân viên",          String.valueOf(staffCount), "đang hoạt động", ACCENT_RED,    ""));
 
         add(statsRow);
         add(Box.createVerticalStrut(20));
@@ -90,39 +90,21 @@ public class DashboardPanel extends JPanel {
             new RoundedBorder(accent.darker(), 1, 12),
             new EmptyBorder(16, 18, 16, 18)
         ));
-        
-        //Panel chứa icon với hiệu ứng background
-        JPanel iconPanel = new JPanel(new GridBagLayout());
-        iconPanel.setBackground(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 40));
-        iconPanel.setPreferredSize(new Dimension(44, 44));
-        iconPanel.setBorder(new RoundedBorder(new Color(60, 65, 85), 1, 10));
-        
-        JLabel emojiLbl = new JLabel(emoji);
-        emojiLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20)); 
-        emojiLbl.setForeground(TEXT_WHITE);
-        iconPanel.add(emojiLbl);
-
-        JPanel top = new JPanel(new BorderLayout());
-        top.setOpaque(false);
-        top.setBackground(CARD_BG);
 
         JLabel valueLbl = new JLabel(value);
         valueLbl.setFont(FONT_CARD_N);
         valueLbl.setForeground(TEXT_WHITE);
 
-        top.add(iconPanel, BorderLayout.WEST);
-        top.add(valueLbl, BorderLayout.EAST);
-
         JLabel labelLbl = new JLabel(label);
         labelLbl.setFont(FONT_MENU_B);
         labelLbl.setForeground(TEXT_WHITE);
-        labelLbl.setBorder(new EmptyBorder(10, 0, 0, 0)); // Tạo khoảng cách với icon
+        labelLbl.setBorder(new EmptyBorder(10, 0, 0, 0));
 
         JLabel subLbl = new JLabel(sub);
         subLbl.setFont(FONT_SMALL);
         subLbl.setForeground(accent);
 
-        card.add(top, BorderLayout.NORTH);
+        card.add(valueLbl, BorderLayout.NORTH);
         card.add(labelLbl, BorderLayout.CENTER);
         card.add(subLbl, BorderLayout.SOUTH);
         return card;
@@ -138,9 +120,9 @@ public class DashboardPanel extends JPanel {
             new EmptyBorder(14, 16, 14, 16)
         ));
 
-        JLabel title = new JLabel("⚠️  Hội viên sắp hết hạn (5 ngày tới)");
+        JLabel title = new JLabel("Hội viên sắp hết hạn (5 ngày tới)");
         title.setFont(FONT_MENU_B);
-        title.setForeground(ACCENT_ORANGE);
+        title.setForeground(TEXT_WHITE);
         panel.add(title, BorderLayout.NORTH);
 
         String[] cols = {"Mã HV", "Họ tên", "SĐT", "Hết hạn"};
@@ -179,9 +161,9 @@ public class DashboardPanel extends JPanel {
             new EmptyBorder(14, 16, 14, 16)
         ));
 
-        JLabel title = new JLabel("✅  Check-in hôm nay");
+        JLabel title = new JLabel("Check-in hôm nay");
         title.setFont(FONT_MENU_B);
-        title.setForeground(ACCENT_GREEN);
+        title.setForeground(TEXT_WHITE);
         panel.add(title, BorderLayout.NORTH);
 
         String[] cols = {"Mã HV", "Họ tên", "Gói tập", "Giờ vào"};

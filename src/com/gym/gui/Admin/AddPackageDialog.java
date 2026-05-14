@@ -23,7 +23,7 @@ public class AddPackageDialog extends JDialog {
     }
 
     public AddPackageDialog(JFrame parent, Runnable onSaved) {
-        super(parent, "➕ Thêm Gói Tập Mới", true);
+        super(parent, "Thêm Gói Tập Mới", true);
         this.onSaved = onSaved;
         pack();
         setMinimumSize(new Dimension(500, 650));
@@ -65,7 +65,7 @@ public class AddPackageDialog extends JDialog {
         gbc.weighty = 0;
         gbc.fill    = GridBagConstraints.HORIZONTAL;
 
-        JButton btnSave = makeActionButton("💾 Lưu gói tập", ACCENT_GREEN);
+        JButton btnSave = makeActionButton("Lưu gói tập", ACCENT_GREEN);
         btnSave.addActionListener(e -> {
             if (tfName.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập Tên gói!");

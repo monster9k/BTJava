@@ -20,8 +20,12 @@ import static com.gym.gui.AppStyle.*;
  */
 public class StaffDashboard extends JFrame {
 
-    static final Color STAFF_ACCENT = new Color(56, 217, 169);
-    static final Color STAFF_DIM    = new Color(40, 40, 55);
+    static final Color STAFF_ACCENT = UIManager.getColor("Label.foreground") != null
+            ? UIManager.getColor("Label.foreground")
+            : Color.BLACK;
+    static final Color STAFF_DIM    = UIManager.getColor("Panel.background") != null
+            ? UIManager.getColor("Panel.background")
+            : new Color(230, 230, 230);
 
     private JPanel  contentPanel;
     private JLabel  clockLabel;
@@ -82,12 +86,12 @@ public class StaffDashboard extends JFrame {
         sb.add(makeSep());
         sb.add(Box.createVerticalStrut(8));
 
-        JButton btnCheckin = menuBtn("✅", "Check-in Khách");
-        JButton btnMember  = menuBtn("➕", "Thêm Hội Viên");
-        JButton btnSub     = menuBtn("📦", "Đăng ký / Gia hạn");
-        JButton btnProfile = menuBtn("👤", "Thông tin cá nhân");
-        JButton btnLogout  = menuBtn("🚪", "Đăng xuất");
-        btnLogout.setForeground(ACCENT_RED);
+        JButton btnCheckin = menuBtn("", "Check-in Khách");
+        JButton btnMember  = menuBtn("", "Thêm Hội Viên");
+        JButton btnSub     = menuBtn("", "Đăng ký / Gia hạn");
+        JButton btnProfile = menuBtn("", "Thông tin cá nhân");
+        JButton btnLogout  = menuBtn("", "Đăng xuất", true);
+        btnLogout.setForeground(TEXT_WHITE);
 
         sb.add(sectionLabel("NGHIỆP VỤ"));
         sb.add(btnCheckin);
@@ -120,48 +124,32 @@ public class StaffDashboard extends JFrame {
         p.setMaximumSize(new Dimension(210, 56));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel icon = new JLabel("💪");
-        icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 22));
-
         JPanel text = new JPanel();
         text.setOpaque(false);
         text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
         JLabel name = new JLabel("GymPro");
-        name.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        name.setForeground(STAFF_ACCENT);
+        name.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        name.setForeground(TEXT_WHITE);
         JLabel role = new JLabel("Staff Portal");
         role.setFont(FONT_SMALL);
         role.setForeground(TEXT_GRAY);
         text.add(name);
         text.add(role);
 
-        p.add(icon);
         p.add(text);
         return p;
     }
 
     private JPanel buildStaffCard() {
         JPanel p = new JPanel(new BorderLayout(10, 0));
-        p.setBackground(new Color(28, 33, 50));
+        p.setBackground(CARD_BG);
         p.setOpaque(true);
         p.setMaximumSize(new Dimension(210, 60));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.setBorder(new EmptyBorder(10, 14, 10, 14));
 
-        JLabel av = new JLabel("👤") {
-            @Override protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(56, 217, 169, 35));
-                g2.fillOval(0, 0, getWidth(), getHeight());
-                g2.setColor(STAFF_ACCENT);
-                g2.setStroke(new BasicStroke(1.5f));
-                g2.drawOval(1, 1, getWidth()-2, getHeight()-2);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        av.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 17));
+        JLabel av = new JLabel("NV");
+        av.setFont(new Font("Segoe UI", Font.BOLD, 12));
         av.setHorizontalAlignment(SwingConstants.CENTER);
         av.setPreferredSize(new Dimension(36, 36));
 
@@ -171,7 +159,7 @@ public class StaffDashboard extends JFrame {
         JLabel nameL = new JLabel(staffDisplayName);
         nameL.setFont(new Font("Segoe UI", Font.BOLD, 12));
         nameL.setForeground(TEXT_WHITE);
-        JLabel onlineL = new JLabel("● Online");
+        JLabel onlineL = new JLabel("Online");
         onlineL.setFont(FONT_SMALL);
         onlineL.setForeground(STAFF_ACCENT);
         info.add(nameL);
@@ -184,11 +172,16 @@ public class StaffDashboard extends JFrame {
     }
 
     private JButton menuBtn(String emoji, String label) {
-        JButton btn = new JButton(emoji + "  " + label);
+        return menuBtn(emoji, label, false);
+    }
+
+    private JButton menuBtn(String emoji, String label, boolean isLogout) {
+        String text = (emoji == null || emoji.trim().isEmpty()) ? label : (emoji + "  " + label);
+        JButton btn = new JButton(text);
         btn.setAlignmentX(Component.LEFT_ALIGNMENT);
         btn.setMaximumSize(new Dimension(210, 40));
         btn.setFont(FONT_MENU);
-        btn.setForeground(TEXT_GRAY);
+        btn.setForeground(SIDEBAR_TEXT);
         btn.setBackground(SIDEBAR_BG);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
@@ -198,10 +191,10 @@ public class StaffDashboard extends JFrame {
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
-                if (btn != activeMenuBtn) { btn.setBackground(STAFF_DIM); btn.setForeground(TEXT_WHITE); }
+                if (btn != activeMenuBtn && !isLogout) { btn.setBackground(SIDEBAR_HOVER); btn.setForeground(TEXT_WHITE); }
             }
             public void mouseExited(MouseEvent e) {
-                if (btn != activeMenuBtn) { btn.setBackground(SIDEBAR_BG); btn.setForeground(TEXT_GRAY); }
+                if (btn != activeMenuBtn && !isLogout) { btn.setBackground(SIDEBAR_BG); btn.setForeground(SIDEBAR_TEXT); }
             }
         });
         return btn;
@@ -210,11 +203,11 @@ public class StaffDashboard extends JFrame {
     private void setActive(JButton btn) {
         if (activeMenuBtn != null) {
             activeMenuBtn.setBackground(SIDEBAR_BG);
-            activeMenuBtn.setForeground(TEXT_GRAY);
+            activeMenuBtn.setForeground(SIDEBAR_TEXT);
             activeMenuBtn.setFont(FONT_MENU);
         }
-        btn.setBackground(STAFF_DIM);
-        btn.setForeground(STAFF_ACCENT);
+        btn.setBackground(SIDEBAR_ACTIVE);
+        btn.setForeground(TEXT_WHITE);
         btn.setFont(FONT_MENU_B);
         activeMenuBtn = btn;
     }
@@ -222,7 +215,7 @@ public class StaffDashboard extends JFrame {
     private JLabel sectionLabel(String t) {
         JLabel l = new JLabel("  " + t);
         l.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        l.setForeground(new Color(75, 85, 115));
+        l.setForeground(SIDEBAR_TEXT);
         l.setBorder(new EmptyBorder(8, 10, 3, 0));
         l.setAlignmentX(Component.LEFT_ALIGNMENT);
         l.setMaximumSize(new Dimension(210, 24));
@@ -271,9 +264,9 @@ public class StaffDashboard extends JFrame {
 
         JLabel badge = new JLabel("STAFF");
         badge.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        badge.setForeground(STAFF_ACCENT);
+        badge.setForeground(TEXT_WHITE);
         badge.setBorder(new CompoundBorder(
-            new RoundedBorder(STAFF_ACCENT, 1, 8),
+            new RoundedBorder(DIVIDER, 1, 8),
             new EmptyBorder(2, 8, 2, 8)
         ));
 
@@ -327,9 +320,9 @@ public class StaffDashboard extends JFrame {
         if (r == JOptionPane.YES_OPTION) {
             dispose();
             java.awt.EventQueue.invokeLater(() -> {
-            new LoginJFram().setVisible(true); 
-        });
+            new LoginJFram().setVisible(true);
+            });
+        }
     }
-}
 
 }

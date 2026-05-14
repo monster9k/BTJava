@@ -18,7 +18,7 @@ public class AddMemberDialog extends JDialog {
     private final UserService userService = new UserService();
 
     public AddMemberDialog(JFrame parent) {
-        super(parent, "➕ Thêm Hội Viên Mới", true);
+        super(parent, "Thêm Hội Viên Mới", true);
         // Đã điều chỉnh: Tăng chiều rộng lên 800, Giảm chiều cao xuống 600 an toàn cho mọi màn hình
         setSize(800, 600);
         setLocationRelativeTo(parent);
@@ -132,7 +132,7 @@ public class AddMemberDialog extends JDialog {
         gbc.gridx = 1; add(tfLinkUsername, gbc);
 
         // --- NÚT LƯU CHIẾM 2 CỘT ---
-        JButton btnSave = makeActionButton("💾 Lưu hội viên", ACCENT_GREEN);
+        JButton btnSave = makeActionButton("Lưu hội viên", ACCENT_GREEN);
         btnSave.addActionListener(e -> {
             String name = tfFullName.getText().trim();
             if (name.isEmpty() || name.contains("Họ và tên")) {

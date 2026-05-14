@@ -73,16 +73,8 @@ public class PersonalInfoPanel extends JPanel {
         c.gridy = 0;
         card.add(styledLabel("Tên hiển thị:"), c);
         c.gridy = 1;
-        JTextField tfName = new JTextField(adminName == null ? "" : adminName);
+        JTextField tfName = makeStyledTextField(adminName == null ? "" : adminName, 20);
         tfName.setEditable(true);
-
-        tfName.setBackground(new Color(35, 40, 60));
-        tfName.setForeground(TEXT_WHITE);
-        tfName.setFont(FONT_NORMAL);
-        tfName.setBorder(new CompoundBorder(
-                new AppStyle.RoundedBorder(DIVIDER, 1, 8),
-                BorderFactory.createEmptyBorder(6, 12, 6, 12)
-        ));
         card.add(tfName, c);
 
         // Mật khẩu
@@ -101,7 +93,7 @@ public class PersonalInfoPanel extends JPanel {
         stylePasswordField(pfConfirm);
         card.add(pfConfirm, c);
 
-        JButton btnSave = makeActionButton("💾 Lưu thay đổi", ACCENT_GREEN);
+        JButton btnSave = makeActionButton("Lưu thay đổi", ACCENT_GREEN);
         btnSave.addActionListener(e -> {
             String np = new String(pfNew.getPassword());
             String cp = new String(pfConfirm.getPassword());

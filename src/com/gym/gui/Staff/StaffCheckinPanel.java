@@ -44,10 +44,12 @@ public class StaffCheckinPanel extends JPanel {
     private JLabel               checkinCountLabel;
     private DefaultTableModel    historyModel;
     private int                  checkinCount = 0;
+    private Subscription         selectedSubscription;
     private final MemberService memberService = new MemberService();
     private final SubscriptionService subscriptionService = new SubscriptionService();
     private final PackageService packageService = new PackageService();
     private final CheckInService checkInService = new CheckInService();
+    private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public StaffCheckinPanel(StaffDashboard owner) {
         this.owner = owner;
@@ -70,7 +72,7 @@ public class StaffCheckinPanel extends JPanel {
         p.setBackground(BG_DARK);
         p.setBorder(new EmptyBorder(0, 0, 4, 0));
 
-        JLabel lbl = new JLabel("✅  Check-in Khách");
+        JLabel lbl = new JLabel("Check-in Khách");
         lbl.setFont(FONT_HEADER);
         lbl.setForeground(TEXT_WHITE);
 
@@ -114,10 +116,6 @@ public class StaffCheckinPanel extends JPanel {
             new EmptyBorder(10, 14, 10, 10)
         ));
 
-        JLabel ico = new JLabel("🔎");
-        ico.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
-        ico.setBorder(new EmptyBorder(0, 0, 0, 8));
-
         searchField = new JTextField();
         searchField.setBackground(CARD_BG);
         searchField.setForeground(TEXT_GRAY);
@@ -141,11 +139,11 @@ public class StaffCheckinPanel extends JPanel {
         });
         searchField.addActionListener(e -> doSearch()); // Enter key
 
-        JButton btnSearch = makeActionButton("🔍  Tìm kiếm", StaffDashboard.STAFF_ACCENT);
-        btnSearch.setForeground(new Color(10, 40, 30));
+        JButton btnSearch = makeActionButton("Tìm kiếm", StaffDashboard.STAFF_ACCENT);
+        Color buttonFg = UIManager.getColor("Button.foreground");
+        btnSearch.setForeground(buttonFg != null ? buttonFg : Color.BLACK);
         btnSearch.addActionListener(e -> doSearch());
 
-        bar.add(ico,         BorderLayout.WEST);
         bar.add(searchField, BorderLayout.CENTER);
         bar.add(btnSearch,   BorderLayout.EAST);
         return bar;
@@ -175,23 +173,23 @@ public class StaffCheckinPanel extends JPanel {
         inner.setOpaque(false);
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
 
-        JLabel ico  = new JLabel("🔍");
-        ico.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 44));
+        JLabel ico  = new JLabel("Tìm hội viên");
+        ico.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         ico.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel h    = new JLabel("Tìm hội viên để check-in");
-        h.setFont(FONT_MENU_B);
-        h.setForeground(TEXT_GRAY);
-        h.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel msg = new JLabel("Không tìm thấy hội viên");
+        msg.setFont(FONT_MENU_B);
+        msg.setForeground(ACCENT_RED);
+        msg.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel sub  = new JLabel("Nhập mã HV hoặc SĐT ở thanh tìm kiếm");
         sub.setFont(FONT_SMALL);
-        sub.setForeground(new Color(90, 100, 130));
+        sub.setForeground(TEXT_GRAY);
         sub.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         inner.add(ico);
         inner.add(Box.createVerticalStrut(10));
-        inner.add(h);
+        inner.add(msg);
         inner.add(Box.createVerticalStrut(5));
         inner.add(sub);
         center.add(inner);
@@ -205,7 +203,7 @@ public class StaffCheckinPanel extends JPanel {
                                     String pkg, String expiry, boolean allowed) {
         memberCard.removeAll();
         Color ac = allowed ? StaffDashboard.STAFF_ACCENT : ACCENT_RED;
-        String statusTxt = allowed ? "✅  ĐƯỢC PHÉP VÀO TẬP" : "❌  GÓI HẾT HẠN / BỊ KHÓA";
+        String statusTxt = allowed ? "DUOC PHEP VAO TAP" : "GOI HET HAN / BI KHOA";
 
         // --- Badge trạng thái ---
         JPanel badge = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -220,20 +218,8 @@ public class StaffCheckinPanel extends JPanel {
         badge.add(badgeLbl);
 
         // --- Avatar + Tên ---
-        JLabel av = new JLabel("👤") {
-            @Override protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(ac.getRed(), ac.getGreen(), ac.getBlue(), 30));
-                g2.fillOval(0, 0, getWidth(), getHeight());
-                g2.setColor(ac);
-                g2.setStroke(new BasicStroke(2));
-                g2.drawOval(1, 1, getWidth()-2, getHeight()-2);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        av.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 36));
+        JLabel av = new JLabel("TH");
+        av.setFont(new Font("Segoe UI", Font.BOLD, 18));
         av.setHorizontalAlignment(SwingConstants.CENTER);
         av.setPreferredSize(new Dimension(66, 66));
 
@@ -277,12 +263,16 @@ public class StaffCheckinPanel extends JPanel {
         details.add(stLbl);
 
         // --- Nút xác nhận ---
-        JButton btnConfirm = new JButton(allowed ? "✅   XÁC NHẬN CHECK-IN" : "⚠️   LIÊN HỆ QUẢN LÝ");
+        JButton btnConfirm = new JButton(allowed ? "XAC NHAN CHECK-IN" : "LIEN HE QUAN LY");
         btnConfirm.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnConfirm.setForeground(allowed ? new Color(8, 35, 25) : Color.WHITE);
-        btnConfirm.setBackground(allowed ? StaffDashboard.STAFF_ACCENT : ACCENT_ORANGE);
-        btnConfirm.setBorderPainted(false);
-        btnConfirm.setFocusPainted(false);
+        Color btnFg = UIManager.getColor("Button.foreground");
+        btnConfirm.setForeground(btnFg != null ? btnFg : Color.BLACK);
+        Color btnBg = UIManager.getColor("Button.background");
+        if (btnBg != null) {
+            btnConfirm.setBackground(btnBg);
+        }
+        btnConfirm.setBorderPainted(true);
+        btnConfirm.setFocusPainted(true);
         btnConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnConfirm.setEnabled(allowed);
         btnConfirm.setPreferredSize(new Dimension(0, 44));
@@ -312,7 +302,7 @@ public class StaffCheckinPanel extends JPanel {
             new EmptyBorder(14, 16, 14, 16)
         ));
 
-        JLabel title = new JLabel("📋  Lịch sử check-in hôm nay");
+        JLabel title = new JLabel("Lịch sử check-in hôm nay");
         title.setFont(FONT_MENU_B);
         title.setForeground(TEXT_WHITE);
         panel.add(title, BorderLayout.NORTH);
@@ -325,26 +315,6 @@ public class StaffCheckinPanel extends JPanel {
 
         JTable table = new JTable(historyModel);
         styleTableAppearance(table);
-
-        // Tô màu teal cho hàng mới nhất (hàng cuối)
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            public Component getTableCellRendererComponent(JTable t, Object v,
-                    boolean sel, boolean foc, int row, int col) {
-                super.getTableCellRendererComponent(t, v, sel, foc, row, col);
-                boolean isLast = (row == t.getRowCount() - 1);
-                if (sel) {
-                    setBackground(new Color(56, 217, 169, 50));
-                } else if (isLast) {
-                    setBackground(new Color(56, 217, 169, 18));
-                } else {
-                    setBackground(row % 2 == 0 ? CARD_BG : new Color(32, 37, 56));
-                }
-                setForeground(TEXT_WHITE);
-                setFont(FONT_NORMAL);
-                setBorder(new EmptyBorder(0, 12, 0, 12));
-                return this;
-            }
-        });
 
         JScrollPane scroll = new JScrollPane(table);
         scroll.getViewport().setBackground(CARD_BG);
@@ -387,16 +357,57 @@ public class StaffCheckinPanel extends JPanel {
             return;
         }
 
-        Subscription sub = subscriptionService.getActiveSubscription(member.getId());
-        GymPackage pkg = sub != null ? packageService.getPackageById(sub.getPackageId()) : null;
+        selectedSubscription = chooseSubscriptionForCheckIn(member.getId());
+        Subscription subForDisplay = selectedSubscription != null
+                ? selectedSubscription
+                : subscriptionService.getLatestSubscription(member.getId());
+
+        GymPackage pkg = subForDisplay != null ? packageService.getPackageById(subForDisplay.getPackageId()) : null;
 
         String pkgName = pkg != null ? pkg.getPackageName() : "";
-        String expiry = sub != null && sub.getEndDate() != null ? sub.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
-        boolean allowed = subscriptionService.isValidForCheckIn(sub);
+        String expiry = subForDisplay != null && subForDisplay.getEndDate() != null
+                ? subForDisplay.getEndDate().format(dateFmt) : "";
+        boolean allowed = selectedSubscription != null;
 
         String displayName = memberService.resolveDisplayName(member);
         String phone = memberService.resolvePhone(member);
         renderMemberFound(member.getMemberCode(), displayName, phone, pkgName, expiry, allowed);
+    }
+
+    private Subscription chooseSubscriptionForCheckIn(int memberId) {
+        java.util.List<Subscription> valid = subscriptionService.getValidSubscriptionsForCheckIn(memberId);
+        if (valid.isEmpty()) {
+            return null;
+        }
+        if (valid.size() == 1) {
+            return valid.get(0);
+        }
+        String[] options = new String[valid.size()];
+        for (int i = 0; i < valid.size(); i++) {
+            Subscription s = valid.get(i);
+            GymPackage p = packageService.getPackageById(s.getPackageId());
+            String name = p != null ? p.getPackageName() : "";
+            String range = s.getStartDate().format(dateFmt) + " - " + s.getEndDate().format(dateFmt);
+            options[i] = name + " (" + range + ")";
+        }
+        String picked = (String) JOptionPane.showInputDialog(
+                this,
+                "Hội viên có nhiều gói đang hoạt động. Chọn gói để check-in:",
+                "Chọn gói",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+        if (picked == null) {
+            return null;
+        }
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].equals(picked)) {
+                return valid.get(i);
+            }
+        }
+        return valid.get(0);
     }
 
     private void renderNotFound() {
@@ -406,14 +417,14 @@ public class StaffCheckinPanel extends JPanel {
         JPanel inner = new JPanel();
         inner.setOpaque(false);
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
-        JLabel ico = new JLabel("❓");
-        ico.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 44));
+        JLabel ico = new JLabel("Khong tim thay");
+        ico.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         ico.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel msg = new JLabel("Không tìm thấy hội viên");
         msg.setFont(FONT_MENU_B);
         msg.setForeground(ACCENT_RED);
         msg.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JLabel sub = new JLabel("Kiểm tra lại mã HV hoặc số điện thoại");
+        JLabel sub = new JLabel("Nhập mã HV hoặc SĐT ở thanh tìm kiếm");
         sub.setFont(FONT_SMALL);
         sub.setForeground(TEXT_GRAY);
         sub.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -437,7 +448,11 @@ public class StaffCheckinPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Không tìm thấy hội viên.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        boolean ok = checkInService.checkInByMemberId(member.getId());
+        if (selectedSubscription == null) {
+            JOptionPane.showMessageDialog(this, "Không có gói hợp lệ để check-in.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        boolean ok = checkInService.checkInBySubscription(member.getId(), selectedSubscription.getId());
         if (!ok) {
             JOptionPane.showMessageDialog(this, "Check-in thất bại. Vui lòng kiểm tra trạng thái gói.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
@@ -449,9 +464,10 @@ public class StaffCheckinPanel extends JPanel {
         checkinCountLabel.setText("Hôm nay: " + historyModel.getRowCount() + " lượt");
 
         JOptionPane.showMessageDialog(this,
-            "✅  Check-in thành công!\n" + name + " — " + time,
+            "Check-in thành công!\n" + name + " - " + time,
             "Check-in", JOptionPane.INFORMATION_MESSAGE
         );
+        selectedSubscription = null;
         renderEmptyState();
         searchField.setText("Nhập mã hội viên hoặc số điện thoại...");
         searchField.setForeground(TEXT_GRAY);

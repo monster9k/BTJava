@@ -92,4 +92,10 @@ public class MemberDAOImpl extends BaseDAO implements IMemberDAO {
         String sql = "UPDATE members SET status = false WHERE id = ?";
         return executeUpdate(sql, id);
     }
+
+    @Override
+    public int updateStatus(int id, boolean status) {
+        String sql = "UPDATE members SET status = ? WHERE id = ?";
+        return executeUpdate(sql, status, id);
+    }
 }

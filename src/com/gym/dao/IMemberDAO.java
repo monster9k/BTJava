@@ -12,4 +12,5 @@ public interface IMemberDAO {
     int insert(Member member);
     int update(Member member);
     int deleteSoft(int id); // Update status = false
+    int updateStatus(int id, boolean status);
 }

@@ -18,7 +18,7 @@ public class AddStaffDialog extends JDialog {
     private final UserService userService = new UserService();
 
     public AddStaffDialog(JFrame parent) {
-        super(parent, "➕ Thêm Nhân Viên Mới", true);
+        super(parent, "Thêm Nhân Viên Mới", true);
         setSize(550, 800);
         setLocationRelativeTo(parent);
         getContentPane().setBackground(CARD_BG);
@@ -57,7 +57,7 @@ public class AddStaffDialog extends JDialog {
         gbc.gridy = row++; add(styledLabel("Vai trò:"), gbc);
         gbc.gridy = row++; add(cbRole, gbc);
 
-        JButton btnSave = makeActionButton("💾 Lưu nhân viên", ACCENT_BLUE);
+        JButton btnSave = makeActionButton("Lưu nhân viên", ACCENT_BLUE);
         btnSave.addActionListener(e -> {
             String name = tfName.getText().trim();
             String username = tfUser.getText().trim();

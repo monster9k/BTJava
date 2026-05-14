@@ -9,6 +9,7 @@ import static com.gym.gui.AppStyle.*;
 
 import com.gym.gui.AppStyle;
 import com.gym.gui.AppStyle.RoundedBorder;
+import com.gym.gui.LoginJFram;
 import com.gym.gui.Staff.*;
  
 /**
@@ -86,13 +87,9 @@ public class AdminDashboard extends JFrame {
         logoPanel.setBackground(SIDEBAR_BG);
         logoPanel.setMaximumSize(new Dimension(220, 70));
         logoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel logoIcon = new JLabel("💪");
-        logoIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
-        logoIcon.setForeground(ACCENT_RED);
         JLabel logoText = new JLabel("GymPro");
         logoText.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        logoText.setForeground(ACCENT_ORANGE);
-        logoPanel.add(logoIcon);
+        logoText.setForeground(TEXT_WHITE);
         logoPanel.add(logoText);
         sidebar.add(logoPanel);
         sidebar.add(makeDivider());
@@ -127,7 +124,7 @@ public class AdminDashboard extends JFrame {
         JButton btnChangePwd = makeMenuButton("  Đổi mật khẩu", false);
         JButton btnPersonal = makeMenuButton("  Thông tin cá nhân", false);
         JButton btnLogout    = makeMenuButton("  Đăng xuất",     false);
-        btnLogout.setForeground(ACCENT_RED);
+        btnLogout.setForeground(TEXT_WHITE);
         sidebar.add(btnChangePwd);
         sidebar.add(btnPersonal);
         sidebar.add(btnLogout);
@@ -145,7 +142,7 @@ public class AdminDashboard extends JFrame {
         btnMembers.addActionListener(e ->   { setActiveMenu(btnMembers);   showPanel(new MemberManagementPanel(this)); });
         btnSubs.addActionListener(e ->      { setActiveMenu(btnSubs);      showPanel(new SubscriptionPanel(this)); });
         btnCheckin.addActionListener(e ->   { setActiveMenu(btnCheckin);   showPanel(new CheckinPanel()); });
-        btnChangePwd.addActionListener(e -> new ChangePwdDialog(this).setVisible(true));
+        btnChangePwd.addActionListener(e -> new ChangePwdDialog(this, adminName).setVisible(true));
         btnPersonal.addActionListener(e -> { setActiveMenu(btnPersonal); showPanel(new PersonalInfoPanel(this, adminName)); });
         btnLogout.addActionListener(e ->    confirmLogout());
 
@@ -157,19 +154,21 @@ public class AdminDashboard extends JFrame {
     private void setActiveMenu(JButton btn) {
         if (activeMenuBtn != null) {
             activeMenuBtn.setBackground(SIDEBAR_BG);
-            activeMenuBtn.setForeground(TEXT_GRAY);
+            activeMenuBtn.setForeground(SIDEBAR_TEXT);
+            activeMenuBtn.setFont(FONT_MENU);
         }
-        btn.setBackground(new Color(40, 40, 55));
-        btn.setForeground(ACCENT_ORANGE);
+        btn.setBackground(SIDEBAR_ACTIVE);
+        btn.setForeground(TEXT_WHITE);
+        btn.setFont(FONT_MENU_B);
         activeMenuBtn = btn;
     }
  
     private JButton makeMenuButton(String text, boolean active) {
         JButton btn = new JButton(text);
         btn.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btn.setFont(FONT_MENU);
-        btn.setForeground(active ? ACCENT_ORANGE : TEXT_GRAY);
-        btn.setBackground(active ? new Color(40, 40, 55) : SIDEBAR_BG);
+        btn.setFont(active ? FONT_MENU_B : FONT_MENU);
+        btn.setForeground(active ? TEXT_WHITE : SIDEBAR_TEXT);
+        btn.setBackground(active ? SIDEBAR_ACTIVE : SIDEBAR_BG);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
         btn.setOpaque(true);
@@ -179,10 +178,16 @@ public class AdminDashboard extends JFrame {
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
-                if (btn != activeMenuBtn) btn.setForeground(TEXT_WHITE);
+                if (btn != activeMenuBtn) {
+                    btn.setBackground(SIDEBAR_HOVER);
+                    btn.setForeground(TEXT_WHITE);
+                }
             }
             public void mouseExited(MouseEvent e) {
-                if (btn != activeMenuBtn) btn.setForeground(TEXT_GRAY);
+                if (btn != activeMenuBtn) {
+                    btn.setBackground(SIDEBAR_BG);
+                    btn.setForeground(SIDEBAR_TEXT);
+                }
             }
         });
         return btn;
@@ -191,7 +196,7 @@ public class AdminDashboard extends JFrame {
     private JLabel makeSectionLabel(String text) {
         JLabel lbl = new JLabel("  " + text);
         lbl.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        lbl.setForeground(new Color(80, 90, 120));
+        lbl.setForeground(SIDEBAR_TEXT);
         lbl.setBorder(new EmptyBorder(10, 10, 4, 0));
         lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
         lbl.setMaximumSize(new Dimension(220, 28));
@@ -226,9 +231,9 @@ public class AdminDashboard extends JFrame {
  
         JLabel badge = new JLabel("ADMIN");
         badge.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        badge.setForeground(ACCENT_ORANGE);
+        badge.setForeground(TEXT_WHITE);
         badge.setBorder(new CompoundBorder(
-            new RoundedBorder(ACCENT_ORANGE, 1, 8),
+            new RoundedBorder(DIVIDER, 1, 8),
             new EmptyBorder(2, 8, 2, 8)
         ));
  
@@ -236,9 +241,9 @@ public class AdminDashboard extends JFrame {
         adminLabel.setFont(FONT_MENU_B);
         adminLabel.setForeground(TEXT_WHITE);
  
-        JLabel avatar = new JLabel("👤");
+        JLabel avatar = new JLabel("AD");
         avatar.setForeground(TEXT_WHITE);
-        avatar.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+        avatar.setFont(new Font("Segoe UI", Font.BOLD, 12));
  
         userInfo.add(badge);
         userInfo.add(adminLabel);
@@ -274,9 +279,9 @@ public class AdminDashboard extends JFrame {
         );
         if (confirm == JOptionPane.YES_OPTION) {
             dispose();
-            // TODO: new LoginFrame().setVisible(true);
-            JOptionPane.showMessageDialog(null, "Đã đăng xuất. Hẹn gặp lại!");
-            System.exit(0);
+            java.awt.EventQueue.invokeLater(() -> {
+                new LoginJFram().setVisible(true);
+            });
         }
     }
 }

@@ -47,6 +47,15 @@ public class SubscriptionService {
         return subscriptionDAO.findActiveSubscription(memberId);
     }
 
+    public List<Subscription> getValidSubscriptionsForCheckIn(int memberId) {
+        return subscriptionDAO.findValidForCheckIn(memberId);
+    }
+
+    public Subscription pickSubscriptionForCheckIn(int memberId) {
+        List<Subscription> validList = getValidSubscriptionsForCheckIn(memberId);
+        return validList.isEmpty() ? null : validList.get(0);
+    }
+
     public Subscription getLatestSubscription(int memberId) {
         return subscriptionDAO.findLatestByMemberId(memberId);
     }

@@ -64,6 +64,19 @@ public class SubscriptionDAOImpl extends BaseDAO implements ISubscriptionDAO {
     }
 
     @Override
+    public List<Subscription> findValidForCheckIn(int memberId) {
+        String sql = "SELECT * FROM subscriptions WHERE member_id = ? AND status = ? AND payment_status = ? " +
+                "AND start_date <= ? AND end_date >= ? ORDER BY end_date DESC, start_date DESC, id DESC";
+        LocalDate today = LocalDate.now();
+        return executeQuery(sql, this::mapSubscription,
+                memberId,
+                AppConstants.SUBSCRIPTION_ACTIVE,
+                AppConstants.PAYMENT_PAID,
+                today,
+                today);
+    }
+
+    @Override
     public int register(Subscription sub) {
         String sql = "INSERT INTO subscriptions (member_id, package_id, start_date, end_date, price_at_purchase, status, payment_status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";

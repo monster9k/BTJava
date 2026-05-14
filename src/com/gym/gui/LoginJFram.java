@@ -228,7 +228,7 @@ public class LoginJFram extends JFrame {
         }
 
         private void initComponents() {
-            setSize(450, 500); // Reduced height since email is removed
+            setSize(450, 600); // Reduced height since email is removed
             setLocationRelativeTo(null);
             setLayout(new BorderLayout());
 

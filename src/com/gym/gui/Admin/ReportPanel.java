@@ -52,7 +52,7 @@ public class ReportPanel extends JPanel {
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
         header.setBackground(BG_DARK);
 
-        JLabel title = new JLabel("📈  Báo cáo Doanh thu");
+        JLabel title = new JLabel("Báo cáo Doanh thu");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
 
@@ -84,9 +84,9 @@ public class ReportPanel extends JPanel {
         revenueValue = new JLabel("0đ");
         packagesValue = new JLabel("0 gói");
         unpaidValue = new JLabel("0 gói");
-        summaryRow.add(makeStatCard("Tổng doanh thu", revenueValue, "theo tháng đã chọn", ACCENT_GREEN, "💰"));
-        summaryRow.add(makeStatCard("Số gói đã bán", packagesValue, "trong tháng", ACCENT_BLUE, "📦"));
-        summaryRow.add(makeStatCard("Chưa thu tiền", unpaidValue, "cần theo dõi", ACCENT_RED, "⚠️"));
+        summaryRow.add(makeStatCard("Tổng doanh thu", revenueValue, "theo tháng đã chọn", ACCENT_GREEN, ""));
+        summaryRow.add(makeStatCard("Số gói đã bán", packagesValue, "trong tháng", ACCENT_BLUE, ""));
+        summaryRow.add(makeStatCard("Chưa thu tiền", unpaidValue, "cần theo dõi", ACCENT_RED, ""));
 
         // --- Detail table ---
         String[] cols = {"Ngày mua", "Mã HV", "Hội viên", "Gói tập", "Giá (VNĐ)", "TT Thanh toán"};
@@ -113,38 +113,20 @@ public class ReportPanel extends JPanel {
             new RoundedBorder(accent.darker(), 1, 12),
             new EmptyBorder(16, 18, 16, 18)
         ));
-        
-        //Panel chứa icon với hiệu ứng background
-        JPanel iconPanel = new JPanel(new GridBagLayout());
-        iconPanel.setBackground(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 40));
-        iconPanel.setPreferredSize(new Dimension(44, 44));
-        iconPanel.setBorder(new RoundedBorder(new Color(60, 65, 85), 1, 10));
-        
-        JLabel emojiLbl = new JLabel(emoji);
-        emojiLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20)); 
-        emojiLbl.setForeground(TEXT_WHITE);
-        iconPanel.add(emojiLbl);
-
-        JPanel top = new JPanel(new BorderLayout());
-        top.setOpaque(false);
-        top.setBackground(CARD_BG);
 
         valueLbl.setFont(FONT_CARD_N);
         valueLbl.setForeground(TEXT_WHITE);
 
-        top.add(iconPanel, BorderLayout.WEST);
-        top.add(valueLbl, BorderLayout.EAST);
-
         JLabel labelLbl = new JLabel(label);
         labelLbl.setFont(FONT_MENU_B);
         labelLbl.setForeground(TEXT_WHITE);
-        labelLbl.setBorder(new EmptyBorder(10, 0, 0, 0)); // Tạo khoảng cách với icon
+        labelLbl.setBorder(new EmptyBorder(10, 0, 0, 0));
 
         JLabel subLbl = new JLabel(sub);
         subLbl.setFont(FONT_SMALL);
         subLbl.setForeground(accent);
 
-        card.add(top, BorderLayout.NORTH);
+        card.add(valueLbl, BorderLayout.NORTH);
         card.add(labelLbl, BorderLayout.CENTER);
         card.add(subLbl, BorderLayout.SOUTH);
         return card;
@@ -199,7 +181,7 @@ public class ReportPanel extends JPanel {
             String memberName = m != null ? m.getFullName() : "";
             String packageName = p != null ? p.getPackageName() : "";
             String price = currencyFormat.format(s.getPriceAtPurchase()) + "đ";
-            String payment = s.getPaymentStatus() == AppConstants.PAYMENT_PAID ? "✅ Đã TT" : "⏳ Chưa TT";
+            String payment = s.getPaymentStatus() == AppConstants.PAYMENT_PAID ? "Đã TT" : "Chưa TT";
 
             addRow(new Object[]{date, memberCode, memberName, packageName, price, payment});
         }

@@ -146,6 +146,19 @@ public class MemberService {
     }
 
     /**
+     * Cập nhật trạng thái hoạt động cho hội viên
+     */
+    public boolean updateMemberStatus(int id, boolean status) {
+        Member member = memberDAO.findById(id);
+        if (member == null) {
+            System.out.println("Không tìm thấy hội viên ID: " + id);
+            return false;
+        }
+        int result = memberDAO.updateStatus(id, status);
+        return result > 0;
+    }
+
+    /**
      * Xóa tạm thời (soft delete) - set status = inactive
      */
     public boolean deactivateMember(int id) {

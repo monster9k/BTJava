@@ -8,6 +8,7 @@ public interface ISubscriptionDAO {
     List<Subscription> findByMemberId(int memberId);
     Subscription findActiveSubscription(int memberId); // Tìm gói đang còn hạn của khách
     Subscription findLatestByMemberId(int memberId);
+    List<Subscription> findValidForCheckIn(int memberId);
 
     int register(Subscription sub); // Đăng ký mới/Gia hạn
     int updatePaymentStatus(int subId, int paymentStatus);

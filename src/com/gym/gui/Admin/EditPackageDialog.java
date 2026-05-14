@@ -34,6 +34,9 @@ public class EditPackageDialog extends JDialog {
         JTextField tfDuration = makeStyledTextField(String.valueOf(pkg.getDurationDays()), 20);
         JTextField tfPrice = makeStyledTextField(pkg.getPrice() != null ? pkg.getPrice().toString() : "", 20);
         JPanel descPanel = makeStyledTextArea(pkg.getDescription() != null ? pkg.getDescription() : "", 4, 20);
+        String[] statusItems = {"Active", "Ẩn"};
+        JComboBox<String> cbStatus = makeStyledCombo(statusItems);
+        cbStatus.setSelectedIndex(pkg.isStatus() ? 0 : 1);
 
         int row = 0;
         gbc.gridy = row++; add(styledLabel("ID:"), gbc);
@@ -44,6 +47,8 @@ public class EditPackageDialog extends JDialog {
         gbc.gridy = row++; add(tfDuration, gbc);
         gbc.gridy = row++; add(styledLabel("Gia (VND):"), gbc);
         gbc.gridy = row++; add(tfPrice, gbc);
+        gbc.gridy = row++; add(styledLabel("Trang thai:"), gbc);
+        gbc.gridy = row++; add(cbStatus, gbc);
         gbc.gridy = row++; add(styledLabel("Mo ta:"), gbc);
 
         gbc.gridy = row++;
@@ -64,11 +69,19 @@ public class EditPackageDialog extends JDialog {
                 int duration = Integer.parseInt(tfDuration.getText().trim());
                 BigDecimal price = new BigDecimal(tfPrice.getText().trim());
                 String desc = ((JTextArea) ((JScrollPane) descPanel.getComponent(0)).getViewport().getView()).getText().trim();
+                boolean status = cbStatus.getSelectedIndex() == 0;
 
                 boolean ok = packageService.updatePackage(pkg.getId(), name, duration, price, desc);
                 if (!ok) {
                     JOptionPane.showMessageDialog(this, "Cap nhat that bai.", "Loi", JOptionPane.ERROR_MESSAGE);
                     return;
+                }
+                if (pkg.isStatus() != status) {
+                    boolean okStatus = packageService.togglePackageStatus(pkg.getId(), status);
+                    if (!okStatus) {
+                        JOptionPane.showMessageDialog(this, "Cap nhat trang thai that bai.", "Loi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Thoi han va gia phai la so hop le.", "Loi", JOptionPane.ERROR_MESSAGE);
@@ -83,4 +96,3 @@ public class EditPackageDialog extends JDialog {
         add(btnSave, gbc);
     }
 }
-

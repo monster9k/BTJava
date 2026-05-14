@@ -49,7 +49,7 @@ public class SubscriptionPanel extends JPanel {
         JLabel title = new JLabel("Đăng ký / Gia hạn Gói tập");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
-        JButton btnAdd = makeActionButton("➕ Đăng ký gói mới", ACCENT_ORANGE);
+        JButton btnAdd = makeActionButton("Đăng ký gói mới", ACCENT_ORANGE);
         btnAdd.addActionListener(e -> {
             new AddSubscriptionDialog(owner).setVisible(true);
             loadSubscriptions();
@@ -100,15 +100,15 @@ public class SubscriptionPanel extends JPanel {
 
             String status;
             if (s.getStatus() == AppConstants.SUBSCRIPTION_PENDING) {
-                status = "⏳ Pending";
+                status = "Pending";
             } else if (s.getStatus() == AppConstants.SUBSCRIPTION_ACTIVE) {
-                status = "✅ Active";
+                status = "Active";
             } else if (s.getStatus() == AppConstants.SUBSCRIPTION_EXPIRED) {
-                status = "🔴 Hết hạn";
+                status = "Hết hạn";
             } else {
-                status = "❌ Hủy";
+                status = "Hủy";
             }
-            String payment = s.getPaymentStatus() == AppConstants.PAYMENT_PAID ? "✅ Đã TT" : "⏳ Chưa TT";
+            String payment = s.getPaymentStatus() == AppConstants.PAYMENT_PAID ? "Đã TT" : "Chưa TT";
 
             addRow(new Object[]{
                     "S" + s.getId(),
@@ -121,7 +121,7 @@ public class SubscriptionPanel extends JPanel {
                     status,
                     payment,
                     created,
-                    "Sửa | Xóa"
+                    "Sửa | Hủy"
             });
         }
     }
@@ -137,26 +137,39 @@ public class SubscriptionPanel extends JPanel {
             new EditSubscriptionDialog(owner, selected).setVisible(true);
             loadSubscriptions();
         });
-        JMenuItem cancel = new JMenuItem("Hủy gói (xóa)");
-        cancel.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(
-                    this,
-                    "Bạn có chắc muốn hủy gói này?",
-                    "Xác nhận",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
-            );
-            if (confirm != JOptionPane.YES_OPTION) {
-                return;
-            }
-            boolean ok = subscriptionService.cancelSubscription(selected.getId());
-            if (!ok) {
-                JOptionPane.showMessageDialog(this, "Hủy gói thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            }
-            loadSubscriptions();
-        });
-        menu.add(edit);
-        menu.add(cancel);
+        if (selected.getStatus() == AppConstants.SUBSCRIPTION_CANCELED) {
+            JMenuItem restore = new JMenuItem("Mở khóa gói");
+            restore.addActionListener(e -> {
+                boolean ok = subscriptionService.updateStatus(selected.getId(), AppConstants.SUBSCRIPTION_ACTIVE);
+                if (!ok) {
+                    JOptionPane.showMessageDialog(this, "Mở khóa gói thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+                loadSubscriptions();
+            });
+            menu.add(edit);
+            menu.add(restore);
+        } else {
+            JMenuItem cancel = new JMenuItem("Hủy gói (khóa)");
+            cancel.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(
+                        this,
+                        "Bạn có chắc muốn hủy gói này?",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+                if (confirm != JOptionPane.YES_OPTION) {
+                    return;
+                }
+                boolean ok = subscriptionService.cancelSubscription(selected.getId());
+                if (!ok) {
+                    JOptionPane.showMessageDialog(this, "Hủy gói thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+                loadSubscriptions();
+            });
+            menu.add(edit);
+            menu.add(cancel);
+        }
         menu.show(invoker, x, y);
     }
 }

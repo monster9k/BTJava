@@ -38,15 +38,15 @@ public class MemberManagementPanel extends JPanel {
         JPanel header = new JPanel(new BorderLayout(12, 0));
         header.setBackground(BG_DARK);
 
-        JLabel title = new JLabel("🏃  Quản lý Hội viên");
+        JLabel title = new JLabel("Quản lý Hội viên");
         title.setFont(FONT_HEADER);
         title.setForeground(TEXT_WHITE);
 
         JPanel searchBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         searchBar.setBackground(BG_DARK);
         JTextField searchField = makeStyledTextField("Tìm theo tên hoặc SĐT...", 20);
-        JButton btnSearch = makeActionButton("🔍 Tìm kiếm", ACCENT_BLUE);
-        JButton btnAdd    = makeActionButton("➕ Thêm hội viên", ACCENT_GREEN);
+        JButton btnSearch = makeActionButton("Tìm kiếm", ACCENT_BLUE);
+        JButton btnAdd    = makeActionButton("Thêm hội viên", ACCENT_GREEN);
         btnAdd.addActionListener(e -> {
             new AddMemberDialog(owner).setVisible(true);
             loadMembers(memberService.getAllMembers());
@@ -92,7 +92,7 @@ public class MemberManagementPanel extends JPanel {
         for (Member m : members) {
             String birth = m.getBirthday() != null ? m.getBirthday().format(dateFmt) : "";
             String created = m.getCreatedAt() != null ? m.getCreatedAt().toLocalDate().format(dateFmt) : "";
-            String status = m.isStatus() ? "✅ Active" : "🔴 Đã khóa";
+            String status = m.isStatus() ? "Active" : "Đã khóa";
             String username = "";
             if (m.getUserId() != null) {
                 com.gym.entity.User u = userService.getById(m.getUserId());
@@ -109,7 +109,7 @@ public class MemberManagementPanel extends JPanel {
                     birth,
                     created,
                     status,
-                    "Sửa | Xóa"
+                    "Sửa | Khóa"
             });
         }
     }
@@ -125,17 +125,21 @@ public class MemberManagementPanel extends JPanel {
             new EditMemberDialog(owner, selected).setVisible(true);
             loadMembers(memberService.getAllMembers());
         });
-        JMenuItem deactivate = new JMenuItem("Xóa (khóa)");
-        deactivate.addActionListener(e -> handleDeactivate(selected));
+        JMenuItem toggle = new JMenuItem(selected.isStatus() ? "Khóa hội viên" : "Mở khóa hội viên");
+        toggle.addActionListener(e -> handleToggleStatus(selected));
         menu.add(edit);
-        menu.add(deactivate);
+        menu.add(toggle);
         menu.show(invoker, x, y);
     }
 
-    private void handleDeactivate(Member member) {
+    private void handleToggleStatus(Member member) {
+        boolean targetStatus = !member.isStatus();
+        String question = targetStatus
+                ? "Bạn có chắc muốn mở khóa hội viên này?"
+                : "Bạn có chắc muốn khóa hội viên này?";
         int confirm = JOptionPane.showConfirmDialog(
                 this,
-                "Bạn có chắc muốn khóa hội viên này?",
+                question,
                 "Xác nhận",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE
@@ -143,13 +147,13 @@ public class MemberManagementPanel extends JPanel {
         if (confirm != JOptionPane.YES_OPTION) {
             return;
         }
-        boolean ok = memberService.deactivateMember(member.getId());
+        boolean ok = memberService.updateMemberStatus(member.getId(), targetStatus);
         if (!ok) {
-            JOptionPane.showMessageDialog(this, "Khóa hội viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Cập nhật trạng thái hội viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (member.getUserId() != null) {
-            userService.toggleUserStatus(member.getUserId(), false);
+            userService.toggleUserStatus(member.getUserId(), targetStatus);
         }
         loadMembers(memberService.getAllMembers());
     }

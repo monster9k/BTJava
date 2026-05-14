@@ -17,8 +17,8 @@ import static com.gym.gui.AppStyle.*;
 public class ChangePwdDialog extends JDialog {
     private final UserService userService = new UserService();
 
-    public ChangePwdDialog(JFrame parent) {
-        super(parent, "🔒 Đổi Mật Khẩu", true);
+    public ChangePwdDialog(JFrame parent, String username) {
+        super(parent, "Đổi Mật Khẩu", true);
         setSize(540, 380);
         setLocationRelativeTo(parent);
         getContentPane().setBackground(CARD_BG);
@@ -47,7 +47,7 @@ public class ChangePwdDialog extends JDialog {
         gbc.gridy=4; add(styledLabel("Xác nhận mật khẩu mới:"), gbc);
         gbc.gridy=5; add(confirmPwd, gbc);
 
-        JButton btnSave = makeActionButton("💾 Lưu thay đổi", ACCENT_GREEN);
+        JButton btnSave = makeActionButton("Lưu thay đổi", ACCENT_GREEN);
         btnSave.addActionListener(e -> {
             String np = new String(newPwd.getPassword());
             String cp = new String(confirmPwd.getPassword());
