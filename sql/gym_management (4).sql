@@ -1,31 +1,31 @@
-
-
-
-
-
-
-
-
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Máy chủ: 127.0.0.1
+-- Thời gian đã tạo: Th5 15, 2026 lúc 03:23 AM
+-- Phiên bản máy phục vụ: 10.4.32-MariaDB
+-- Phiên bản PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
 
-;
-;
-;
-;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
+--
+-- Cơ sở dữ liệu: `gym_management`
+--
 
+-- --------------------------------------------------------
 
-
-
-
-
-
-
-
+--
+-- Cấu trúc bảng cho bảng `check_ins`
+--
 
 CREATE TABLE `check_ins` (
   `id` int(11) NOT NULL,
@@ -33,19 +33,22 @@ CREATE TABLE `check_ins` (
   `check_in_time` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
-
+--
+-- Đang đổ dữ liệu cho bảng `check_ins`
+--
 
 INSERT INTO `check_ins` (`id`, `subscription_id`, `check_in_time`) VALUES
 (4, 4, '2026-05-13 13:11:07'),
-(5, 7, '2026-05-14 01:23:00');
+(5, 7, '2026-05-14 01:23:00'),
+(6, 9, '2026-05-14 09:49:15'),
+(7, 8, '2026-05-14 10:16:09'),
+(8, 4, '2026-05-14 11:08:03');
 
+-- --------------------------------------------------------
 
-
-
-
-
+--
+-- Cấu trúc bảng cho bảng `members`
+--
 
 CREATE TABLE `members` (
   `id` int(11) NOT NULL,
@@ -59,12 +62,12 @@ CREATE TABLE `members` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
-
+--
+-- Đang đổ dữ liệu cho bảng `members`
+--
 
 INSERT INTO `members` (`id`, `user_id`, `member_code`, `full_name`, `phone`, `gender`, `birthday`, `status`, `created_at`) VALUES
-(3, 6, 'GYM260003', 'phuc', '1234567890', 'Nam', '2006-05-07', 0, '2026-05-13 12:50:18'),
+(3, 6, 'GYM260003', 'phuc', '1234567890', 'Nam', '2006-05-07', 1, '2026-05-13 12:50:18'),
 (4, 7, 'GYM260004', 'Minh Trí', '2132321321213', 'Nam', '2006-02-07', 1, '2026-05-13 12:51:16'),
 (5, 8, 'GYM260005', 'phuc cho dien', '0908766788', 'Nam', '2004-03-09', 1, '2026-05-13 13:08:13'),
 (6, 11, 'GYM260006', 'Lê Hoài An', '0901000003', 'Nam', '1995-02-14', 1, '2026-05-14 01:18:04'),
@@ -86,13 +89,14 @@ INSERT INTO `members` (`id`, `user_id`, `member_code`, `full_name`, `phone`, `ge
 (22, 27, 'GYM260022', 'Võ Hoàng Uyên', '0901000019', 'Nữ', '2003-01-31', 1, '2026-05-14 01:18:04'),
 (23, 28, 'GYM260023', 'Đào Thúy Vy', '0901000020', 'Nữ', '1995-04-04', 1, '2026-05-14 01:18:04'),
 (24, NULL, 'GYM260024', 'Khách Vãng Lai 01', '0901000098', 'Nam', '1980-12-12', 1, '2026-05-14 01:18:04'),
-(25, NULL, 'GYM260025', 'Khách Vãng Lai 02', '0901000099', 'Nữ', '1975-06-06', 1, '2026-05-14 01:18:04');
+(25, NULL, 'GYM260025', 'Khách Vãng Lai 02', '0901000099', 'Nữ', '1975-06-06', 1, '2026-05-14 01:18:04'),
+(26, 29, 'GYM260026', 'Nguyễn Viết Thắng Lợn', '022321321', NULL, NULL, 1, '2026-05-14 01:29:43');
 
+-- --------------------------------------------------------
 
-
-
-
-
+--
+-- Cấu trúc bảng cho bảng `packages`
+--
 
 CREATE TABLE `packages` (
   `id` int(11) NOT NULL,
@@ -103,9 +107,9 @@ CREATE TABLE `packages` (
   `status` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
-
+--
+-- Đang đổ dữ liệu cho bảng `packages`
+--
 
 INSERT INTO `packages` (`id`, `package_name`, `duration_days`, `price`, `description`, `status`) VALUES
 (1, 'Gói Gym 1 Tháng', 30, 350000.00, 'Gói cơ bản', 1),
@@ -134,31 +138,31 @@ INSERT INTO `packages` (`id`, `package_name`, `duration_days`, `price`, `descrip
 (24, 'Thẻ Tập Thử (Trial) 7 Ngày', 7, 100000.00, 'Trải nghiệm phòng tập 1 tuần', 1),
 (25, 'Gói VIP Toàn Diện', 30, 2000000.00, 'Gym, Bơi, Yoga, Xông hơi, Tủ đồ riêng', 1);
 
+-- --------------------------------------------------------
 
-
-
-
-
+--
+-- Cấu trúc bảng cho bảng `roles`
+--
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL,
   `role_name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
-
+--
+-- Đang đổ dữ liệu cho bảng `roles`
+--
 
 INSERT INTO `roles` (`id`, `role_name`) VALUES
 (1, 'ADMIN'),
 (3, 'MEMBER'),
 (2, 'STAFF');
 
+-- --------------------------------------------------------
 
-
-
-
-
+--
+-- Cấu trúc bảng cho bảng `subscriptions`
+--
 
 CREATE TABLE `subscriptions` (
   `id` int(11) NOT NULL,
@@ -172,20 +176,22 @@ CREATE TABLE `subscriptions` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
-
+--
+-- Đang đổ dữ liệu cho bảng `subscriptions`
+--
 
 INSERT INTO `subscriptions` (`id`, `member_id`, `package_id`, `start_date`, `end_date`, `price_at_purchase`, `status`, `payment_status`, `created_at`) VALUES
 (4, 5, 2, '2026-05-13', '2026-08-11', 1200000.00, 1, 1, '2026-05-13 13:08:29'),
 (5, 4, 3, '2026-05-13', '2026-06-12', 200000.00, 1, 1, '2026-05-13 13:13:49'),
-(7, 7, 8, '2026-05-14', '2027-05-14', 5000000.00, 1, 1, '2026-05-14 01:22:20');
+(7, 7, 8, '2026-05-14', '2027-05-14', 5000000.00, 1, 1, '2026-05-14 01:22:20'),
+(8, 26, 4, '2026-05-14', '2027-05-14', 12000000.00, 1, 1, '2026-05-14 01:30:05'),
+(9, 26, 6, '2026-05-14', '2026-06-13', 500000.00, 1, 1, '2026-05-14 02:27:12');
 
+-- --------------------------------------------------------
 
-
-
-
-
+--
+-- Cấu trúc bảng cho bảng `users`
+--
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
@@ -197,13 +203,13 @@ CREATE TABLE `users` (
   `status` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
-
+--
+-- Đang đổ dữ liệu cho bảng `users`
+--
 
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `phone`, `role_id`, `status`) VALUES
 (1, 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'Quản lý Khoa', '1231232', 1, 1),
-(2, 'staff1', 'e10adc3949ba59abbe56e057f20f883e', 'Lễ tân Phúc', '0903846809', 2, 1),
+(2, 'staff1', 'e10adc3949ba59abbe56e057f20f883e', 'Lê xuân phúc', '0903846809', 2, 1),
 (3, 'khachhang1', 'e10adc3949ba59abbe56e057f20f883e', 'Nguyễn Văn Khách', '1234566', 3, 1),
 (4, 'Phuc', 'e10adc3949ba59abbe56e057f20f883e', 'phuc', '1234567890', 2, 1),
 (5, 'nguyen', 'e10adc3949ba59abbe56e057f20f883e', 'nguyen xau trai', '12321321321', 2, 1),
@@ -229,127 +235,128 @@ INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `phone`, `role_i
 (25, 'member_son', 'e10adc3949ba59abbe56e057f20f883e', 'Trịnh Thái Sơn', '0901000017', 3, 1),
 (26, 'member_tu', 'e10adc3949ba59abbe56e057f20f883e', 'Đoàn Thanh Tú', '0901000018', 3, 1),
 (27, 'member_uyen', 'e10adc3949ba59abbe56e057f20f883e', 'Võ Hoàng Uyên', '0901000019', 3, 1),
-(28, 'member_vy', 'e10adc3949ba59abbe56e057f20f883e', 'Đào Thúy Vy', '0901000020', 3, 1);
+(28, 'member_vy', 'e10adc3949ba59abbe56e057f20f883e', 'Đào Thúy Vy', '0901000020', 3, 1),
+(29, 'member_thang', 'e10adc3949ba59abbe56e057f20f883e', 'Nguyễn Viết Thắng', '232321311321', 3, 1);
 
+--
+-- Chỉ mục cho các bảng đã đổ
+--
 
-
-
-
-
-
-
+--
+-- Chỉ mục cho bảng `check_ins`
+--
 ALTER TABLE `check_ins`
   ADD PRIMARY KEY (`id`),
   ADD KEY `subscription_id` (`subscription_id`);
 
-
-
-
+--
+-- Chỉ mục cho bảng `members`
+--
 ALTER TABLE `members`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `member_code` (`member_code`),
   ADD UNIQUE KEY `user_id` (`user_id`),
   ADD UNIQUE KEY `phone` (`phone`);
 
-
-
-
+--
+-- Chỉ mục cho bảng `packages`
+--
 ALTER TABLE `packages`
   ADD PRIMARY KEY (`id`);
 
-
-
-
+--
+-- Chỉ mục cho bảng `roles`
+--
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `role_name` (`role_name`);
 
-
-
-
+--
+-- Chỉ mục cho bảng `subscriptions`
+--
 ALTER TABLE `subscriptions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `member_id` (`member_id`),
   ADD KEY `package_id` (`package_id`);
 
-
-
-
+--
+-- Chỉ mục cho bảng `users`
+--
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD KEY `role_id` (`role_id`);
 
+--
+-- AUTO_INCREMENT cho các bảng đã đổ
+--
 
-
-
-
-
-
-
+--
+-- AUTO_INCREMENT cho bảng `check_ins`
+--
 ALTER TABLE `check_ins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
-
-
-
+--
+-- AUTO_INCREMENT cho bảng `members`
+--
 ALTER TABLE `members`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
-
-
-
+--
+-- AUTO_INCREMENT cho bảng `packages`
+--
 ALTER TABLE `packages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
-
-
-
+--
+-- AUTO_INCREMENT cho bảng `roles`
+--
 ALTER TABLE `roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
-
-
-
+--
+-- AUTO_INCREMENT cho bảng `subscriptions`
+--
 ALTER TABLE `subscriptions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
-
-
-
+--
+-- AUTO_INCREMENT cho bảng `users`
+--
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
+--
+-- Các ràng buộc cho các bảng đã đổ
+--
 
-
-
-
-
-
-
+--
+-- Các ràng buộc cho bảng `check_ins`
+--
 ALTER TABLE `check_ins`
   ADD CONSTRAINT `check_ins_ibfk_1` FOREIGN KEY (`subscription_id`) REFERENCES `subscriptions` (`id`);
 
-
-
-
+--
+-- Các ràng buộc cho bảng `members`
+--
 ALTER TABLE `members`
   ADD CONSTRAINT `members_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
-
-
-
+--
+-- Các ràng buộc cho bảng `subscriptions`
+--
 ALTER TABLE `subscriptions`
   ADD CONSTRAINT `subscriptions_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
   ADD CONSTRAINT `subscriptions_ibfk_2` FOREIGN KEY (`package_id`) REFERENCES `packages` (`id`);
 
-
-
-
+--
+-- Các ràng buộc cho bảng `users`
+--
 ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
 COMMIT;
 
-;
-;
-;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
